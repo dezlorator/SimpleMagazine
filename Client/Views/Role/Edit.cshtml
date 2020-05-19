@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model PetStore.Models.ViewModels.ChangeRoleModel
+@{
+    ViewBag.Title = "Роли";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <form asp-action="Edit" asp-controller="Role" method="post">
+        <input type="hidden" name="userId" value="@Model.UserId" />
+        <div class="card mt-2">
+            <div class="card-body">
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label for="name">Изменение ролей для пользователя @Model.UserEmail</label>
+                    </h5>
+                    @foreach (IdentityRole role in Model.AllRoles)
+                    {
+                        <input type="checkbox" name="roles" value="@role.Name"
+                               @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name <br />
+                    }
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <button class="btn btn-success btn-transparent rounded-pill" type="submit">Сохранить</button>
+            <button class="btn btn-secondary btn-transparent rounded-pill" asp-action="UserList">Отмена</button>
+        </div>
+        <br />
+    </form>
+</div>

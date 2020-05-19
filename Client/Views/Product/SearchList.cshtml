@@ -1,0 +1,56 @@
+﻿@model ProductsListViewModel
+@{
+    ViewBag.Title = "Поиск";
+    Layout = "_AdminLayout";
+}
+
+<div class="row m-1 p-1">
+    <div id="categories" class="col-3">
+        <div class="card text-center mt-2">
+            <div class="card-body">
+                <h5 class="card-title">Расширенный поиск</h5>
+                <form asp-action="SearchList" asp-controller="Product" method="post">
+                    <input type="hidden" name="name" value="@Model.CurrentFilter.Name" />
+                    <h6>Категории</h6>
+                    @foreach (CategoryNode category in Model.Categories)
+                    {
+                        <div class="form-check">
+                            <input name="categories" class="form-check-input" type="checkbox" value="@category" id="defaultCheck">
+                            <label class="form-check-label" for="defaultCheck">
+                                @category.Name
+                            </label>
+                        </div>
+                    }
+                    <br />
+                    <h6>Цена</h6>
+                    <div class="form-row">
+                        <div class="col">
+                            <input name="minPrice" type="number" min="0" placeholder="Мин" class="form-control">
+                        </div>
+                        <div class="col">
+                            <input name="maxPrice" type="number" min="0" placeholder="Макс" class="form-control">
+                        </div>
+                    </div>
+                    <br />
+                    <button class="btn btn-light rounded-pill" type="submit">Найти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-9">
+        @if (TempData["message_search"] != null)
+        {
+            <div class="alert alert-success mt-2">@TempData["message_search"]</div>
+        }
+        @foreach (var product in Model.Products)
+        {
+            <partial name="ProductSummary" model="product" />
+        }
+
+        <div page-model="@Model.PagingInfo" page-action="List" page-classes-enabled="true"
+             page-class="btn" page-class-normal="btn-light"
+             page-class-selected="btn-primary" page-url-categories="@Model.CurrentFilter.Categories"
+             class="btn-group mt-2">
+        </div>
+    </div>
+</div>

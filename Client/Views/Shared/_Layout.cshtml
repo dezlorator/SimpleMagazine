@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet"
+          asp-href-include="/lib/bootstrap/dist/**/*.min.css"
+          asp-href-exclude="**/*-reboot*,**/*-grid*" />
+    <link rel="stylesheet" asp-href-include="/lib/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" asp-href-include="/css/StyleSheet.css" />
+    <title>Зоотовары</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand ml-3 mb-0 h1" asp-action="List"
+           asp-controller="Product"
+           asp-route-category="">
+            <img src="~/images/site-icon.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            ЗООТОВАРЫ
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="col navbar-nav">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="nav-item nav-link @(ViewBag.Current == "MyOrders" ? "active" : "")" asp-action="MyList" asp-controller="Order">Мои заказы</a>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <a class="nav-item nav-link @(ViewBag.Current == "Orders" ? "active" : "")" asp-action="List" asp-controller="Order">Заказы</a>
+                    <a class="nav-item nav-link @(ViewBag.Current == "OrdersShipped" ? "active" : "")" asp-action="ListShipped" asp-controller="Order">Обработанные заказы</a>
+                    <a class="nav-item nav-link @(ViewBag.Current == "Products" ? "active" : "")" asp-action="Index" asp-controller="Admin">Товары</a>
+                    <a class="nav-item nav-link @(ViewBag.Current == "Categories" ? "active" : "")" asp-action="List" asp-controller="Category">Категории</a>
+                    <a class="nav-item nav-link @(ViewBag.Current == "Statistics" ? "active" : "")" asp-action="Index" asp-controller="Statistics">Статистика</a>
+
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="nav-item nav-link @(ViewBag.Current == "Roles" ? "active" : "")" asp-action="Index" asp-controller="Role">Роли</a>
+                    <a class="nav-item nav-link @(ViewBag.Current == "Users" ? "active" : "")" asp-action="UserList" asp-controller="Role">Пользователи</a>
+                }
+            </div>
+            <div class="p-1 bg-light rounded rounded-pill shadow-sm">
+                <form asp-action="SearchList" asp-controller="Product" method="post" class="form-inline">
+                    <div class="input-group">
+                        <input name="name" class="form-control form-control border-0 bg-light rounded rounded-pill" type="search" placeholder="Поиск" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-link text-primary" type="submit"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col col-md-auto">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="d-flex flex-row-reverse">
+                        <a class="ml-2 btn rounded-pill btn-outline-light navbar-btn"
+                           asp-action="Logout" asp-controller="Account">Выход</a>
+                        @await Component.InvokeAsync("CartSummary")
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-row-reverse">
+                        <a class="ml-2 btn rounded-pill btn-outline-light navbar-btn"
+                           asp-action="Register" asp-controller="Account">Регистрация</a>
+                        <a class="btn rounded-pill btn-outline-light navbar-btn"
+                           asp-action="Login" asp-controller="Account">Вход</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </nav>
+    <div class="row m-1 p-1">
+        <div id="categories" class="col-3">
+            @await Component.InvokeAsync("NavigationMenu")
+        </div>
+        <div class="col-9">
+            @if (TempData["message"] != null)
+            {
+                <div class="alert alert-success mt-1">@TempData["message"]</div>
+            }
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>

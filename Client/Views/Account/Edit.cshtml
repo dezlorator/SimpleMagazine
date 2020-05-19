@@ -1,0 +1,38 @@
+﻿@model EditModel
+@{
+    ViewBag.Title = "Редактировать данные";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <div class="card mt-2">
+        <div class="card-body">
+            <h5 class="card-title">
+                Редактировать данные
+            </h5>
+            <p class="card-text">Введите новые значения.</p>
+            <div class="text-danger" asp-validation-summary="All"></div>
+        </div>
+    </div>
+
+    <form asp-action="Edit" asp-controller="Account" method="post">
+        <div class="card mt-2">
+            <div class="card-body">
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Birthday">Дата рождения</label>
+                    </h5>
+                    <div><span asp-validation-for="Birthday" class="text-danger"></span></div>
+                    <input asp-for="Birthday" type="date" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <button class="btn btn-success btn-transparent rounded-pill" type="submit">Сохранить</button>
+            <a href="@Model.ReturnUrl" class="btn btn-secondary btn-transparent rounded-pill">Отмена</a>
+        </div>
+        <br />
+    </form>
+
+</div>

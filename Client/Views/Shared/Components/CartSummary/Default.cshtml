@@ -1,0 +1,17 @@
+﻿@model Cart
+
+<div>
+    @if (Model.Lines.Count() > 0)
+    {
+        <small class="navbar-text">
+            <b>Ваша корзина:</b>
+            @Model.Lines.Sum(x => x.Quantity) товар(ов)
+            @Model.ComputeTotalValue().ToString("c", CultureInfo.GetCultureInfo("uk-UA"));
+        </small>
+    }
+    <a class="btn rounded-pill btn-outline-light navbar-btn"
+       asp-controller="Cart" asp-action="Index"
+       asp-route-returnurl="@ViewContext.HttpContext.Request.PathAndQuery()">
+        <i class="fa fa-shopping-cart"></i>
+    </a>
+</div>

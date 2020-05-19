@@ -1,0 +1,33 @@
+﻿@model CategoryCostylViewModel
+
+@if (Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children.Count != 0)
+{
+    @foreach (var category in Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children.OrderBy(c => c.Name))
+    {
+        <div class="row mb-1">
+            <div class="col">
+                <div class="form-check">
+                    <input name="categories" class="form-check-input" type="checkbox" value="@category.ID" id="defaultCheck">
+                    <label class="form-check-label" for="defaultCheck">
+                        @category.Name
+                    </label>
+                </div>
+            </div>
+            @if (category.Children != null)
+            {
+                @if (category.Children.Count > 0)
+                {
+                    <div class="col col-md-auto">
+                        <a class="accordion" id="@(category.ID+category.Name)"></a>
+                    </div>
+                }
+            }
+        </div>
+        @if (category.Children != null)
+        {
+            <div class="panel mt-1" id="@("panel_" + category.ID + category.Name)">
+                <partial name="ChildCategoryItemCheck" model="new CategoryCostylViewModel { ID = category.ID, Categories = Model.Categories }" />
+            </div>
+        }
+    }
+}

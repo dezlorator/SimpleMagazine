@@ -1,0 +1,36 @@
+﻿@model CategoryCostylViewModel
+
+@if (Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children.Count != 0)
+{
+    @foreach (var category in Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children.OrderBy(c=>c.Name))
+    {
+        <div class="row mb-1">
+            <div class="col">
+                <a class="btn btn-block rounded-pill
+                @(category.ID.ToString() == ViewBag.SelectedCategory ? "btn-primary" : "btn-light")"
+                   asp-action="List"
+                   asp-controller="Product"
+                   asp-route-categories="@category.ID"
+                   asp-route-category="@category.ID"
+                   asp-route-productPage="1">
+                    @category.Name
+                </a>
+            </div>
+            @if (category.Children != null)
+            {
+                @if (category.Children.Count > 0)
+                {
+                    <div class="col col-md-auto">
+                        <button class="accordion btn btn-light btn-block rounded-pill" id="@category.ID"></button>
+                    </div>
+                }
+            }
+        </div>
+        @if (category.Children != null)
+        {
+            <div class="panel mt-1" id="@("panel_" + category.ID)">
+                <partial name="ChildCategoryItem" model="new CategoryCostylViewModel { ID = category.ID, Categories = Model.Categories }" />
+            </div>
+        }
+    }
+}

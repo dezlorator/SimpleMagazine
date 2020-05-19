@@ -1,0 +1,27 @@
+﻿@model EditModel
+@{
+    ViewBag.Title = "Удаление аккаунта";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <div class="card mt-2">
+        <div class="card-body">
+            <h5 class="card-title">
+                Вы уверены, что хотите удалить аккаунт?
+            </h5>
+            <p class="card-text">Данное действие нельзя будет отменить.</p>
+            <div class="text-danger" asp-validation-summary="All"></div>
+        </div>
+    </div>
+
+    <form asp-action="Delete" asp-controller="Account" method="post">
+        <br />
+        <div class="text-center">
+            <button class="btn btn-danger btn-transparent rounded-pill" type="submit">Да</button>
+            <a href="@Model.ReturnUrl" class="btn btn-secondary btn-transparent rounded-pill">Нет</a>
+        </div>
+        <br />
+    </form>
+
+</div>

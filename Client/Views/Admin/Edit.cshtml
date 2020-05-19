@@ -1,0 +1,90 @@
+﻿@model ProductWithCategoryViewModel
+@{
+    ViewBag.Title = "Редактировать товар";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <div class="card mt-2">
+            <div class="card-body">
+                <h3 class="card-title">
+                    Товар
+                </h3>
+                <input type="hidden" asp-for="ID" value="@Model.Product.ID" />
+                <input type="hidden" asp-for="Product.Product.ID" value="@Model.Product.Product.ID" />
+                <input type="hidden" asp-for="Product.ProductIdentifier" value="@Model.Product.Product.ID" />
+                <input type="hidden" asp-for="Product.Product.ImageId" />
+                @if (!String.IsNullOrWhiteSpace(Model.Product.Product.ImageId))
+                {
+                    <img src="@Url.Action("GetImage", new { id=@Model.Product.Product.ImageId })" class="rounded" height="200" alt="Товар" />
+                }
+                else
+                {
+                    <img src="~/images/pets.png" class="rounded" height="200" alt="Товар" />
+                }
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.Product.Name">Название</label>
+                    </h5>
+                    <div><span asp-validation-for="Product.Product.Name" class="text-danger"></span></div>
+                    <input asp-for="Product.Product.Name" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.Product.Category.ID">Категория</label>
+                    </h5>
+                    <select class="custom-select mr-sm-2" asp-for="Product.Product.Category.ID">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.ID">@category.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.Manufacturer">Производитель</label>
+                    </h5>
+                    <div><span asp-validation-for="Product.Manufacturer" class="text-danger"></span></div>
+                    <input asp-for="Product.Manufacturer" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.OriginCountry">Страна производства</label>
+                    </h5>
+                    <div><span asp-validation-for="Product.OriginCountry" class="text-danger"></span></div>
+                    <input asp-for="Product.OriginCountry" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title"><label asp-for="Product.Product.Description">Описание</label></h5>
+                    <div><span asp-validation-for="Product.Product.Description" class="text-danger"></span></div>
+                    <textarea asp-for="Product.Product.Description" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title"><label asp-for="Product.LongDescription">Расширенное описание</label></h5>
+                    <div><span asp-validation-for="Product.LongDescription" class="text-danger"></span></div>
+                    <textarea asp-for="Product.LongDescription" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.Product.Price">Цена</label>
+                    </h5>
+                    <div><span asp-validation-for="Product.Product.Price" class="text-danger"></span></div>
+                    <input asp-for="Product.Product.Price" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label asp-for="Product.Product.Image" class="control-label">Загрузить изображение</label>
+                    </h5>
+                    <input asp-for="Product.Product.Image" type="file" name="Product.Product.Image" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <button class="btn btn-success btn-transparent rounded-pill" type="submit">Сохранить</button>
+            <a asp-action="Index" asp-controller="Admin" class="btn btn-secondary btn-transparent rounded-pill">Отмена</a>
+        </div>
+        <br />
+    </form>
+</div>

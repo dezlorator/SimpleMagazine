@@ -1,0 +1,97 @@
+﻿@model AdminProductsListViewModel
+@{
+    ViewBag.Title = "Все товары";
+    Layout = "_AdminLayout";
+}
+
+<div class="card mt-2">
+    <div class="card-body">
+        <h3 class="card-title">Все товары</h3>
+        <form asp-action="Index" asp-controller="Admin" method="post">
+            <div class="form-row">
+                <div class="col-auto">
+                    <input name="Name" type="text" class="form-control" placeholder="Название" />
+                </div>
+                <div class="col-auto">
+                    <input name="minPrice" type="number" class="form-control" min="0" placeholder="Мин">
+                </div>
+                <div class="col-auto">
+                    <input name="maxPrice" type="number" class="form-control" min="0" placeholder="Макс">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary rounded-pill mb-2">Найти</button>
+                </div>
+            </div>
+        </form>
+        @if (Model.Stock.Count() < 1)
+        {
+            <div class="card mt-2">
+                <div class="card-body">
+                    Товары не найдены
+                </div>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-right">ID</th>
+                        <th>Название</th>
+                        <th class="text-right">Цена</th>
+                        <th class="text-right">Количество на складе</th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                @foreach (var item in Model.Stock)
+                {
+                    if (item != null)
+                    {
+                        <tr>
+                            <td class="text-right">@item.ID</td>
+                            <td>@item.Product.Name</td>
+                            <td class="text-right">@item.Product.Price.ToString("c", CultureInfo.GetCultureInfo("uk-UA"))</td>
+                            <td class="text-right">@item.Quantity</td>
+                            <td style="width:15%" class="text-center">
+                                <form asp-action="Delete" method="post">
+                                    <a asp-action="Edit" class="btn btn-sm btn-warning rounded-pill"
+                                       asp-route-productId="@item.Product.ID">
+                                        Редактировать
+                                    </a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <input type="hidden" name="ProductID" value="@item.Product.ID" />
+                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill">
+                                            Удалить
+                                        </button>
+                                    }
+                                </form>
+                                <form class="form-inline mt-2" asp-action="AddToStock" method="post">
+                                    <input type="hidden" name="productId" value="@item.Product.ID" />
+                                    <div class="input-group">
+                                        <input type="number" name="Quantity" value="0" min="0" class="form-control form-control-sm rounded-pill" />
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-pill ml-1">
+                                                Заказать
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        }
+    </div>
+</div>
+<div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+     page-class="btn" page-class-normal="btn-light"
+     page-class-selected="btn-primary" page-url-categories="@Model.CurrentFilter.Categories"
+     class="btn-group mt-2">
+</div>
+<br />
+<div class="text-center">
+    <a asp-action="Create" class="btn btn-primary btn-transparent rounded-pill">Добавить продукт</a>
+</div>
+<br />

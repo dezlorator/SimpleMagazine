@@ -1,0 +1,18 @@
+﻿@model CategoryCostylViewModel
+
+<h6 class="card-title">@Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Name</h6>
+<a class="card-link" asp-action="Create" asp-route-parentId="@Model.Categories.FirstOrDefault(c => c.ID == Model.ID).ID">Добавить подкатегорию</a>
+<a class="card-link" asp-action="Edit" asp-route-categoryId="@Model.Categories.FirstOrDefault(c => c.ID == Model.ID).ID">Редактировать</a>
+<a class="card-link" asp-action="Delete" asp-route-categoryId="@Model.Categories.FirstOrDefault(c => c.ID == Model.ID).ID">Удалить</a>
+<div class="mb-2"></div>
+@if (Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children.Count != 0)
+{
+    @foreach (var category in Model.Categories.FirstOrDefault(c => c.ID == Model.ID).Children)
+    {
+        <div class="card">
+            <div class="card-body">
+                <partial name="ChildCategory" model="new CategoryCostylViewModel { ID = category.ID, Categories = Model.Categories }" />
+            </div>
+        </div>
+    }
+}

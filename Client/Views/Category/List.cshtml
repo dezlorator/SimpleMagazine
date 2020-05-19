@@ -1,0 +1,27 @@
+﻿@model IQueryable<CategoryNode>
+@{
+    ViewBag.Title = "Категории";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-75">
+    <div class="card mt-2">
+        <div class="card-body">
+            <h3 class="card-title">
+                Управление категориями
+            </h3>
+            @if (Model.FirstOrDefault(c => c.IsRoot).Children.Count != 0)
+            {
+                        @foreach (var category in Model.FirstOrDefault(c => c.IsRoot).Children)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    <partial name="ChildCategory" model="new CategoryCostylViewModel { ID = category.ID, Categories = Model }" />
+                                </div>
+                            </div>
+                        }
+            }
+            <a class="btn btn-outline-dark btn-sm mt-2" asp-action="Create" asp-route-parentId="@Model.FirstOrDefault(c => c.IsRoot).ID">Добавить категорию</a>
+        </div>
+    </div>
+</div>

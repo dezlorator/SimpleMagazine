@@ -1,0 +1,24 @@
+﻿body {
+    background: url('/images/background_pets.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.card {
+    background-color: rgba(245, 245, 245, 0.8);
+}
+
+.btn-group {
+    opacity: .8
+}
+
+.btn.btn-transparent {
+    opacity: .9
+}
+
+.card-header, .card-footer {
+    opacity: 1
+}
+
+tbody.collapse.in {
+    display: table-row-group;
+}

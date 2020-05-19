@@ -1,0 +1,26 @@
+﻿@model string
+@{
+    ViewBag.Title = "Роли";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <form asp-action="Create" asp-controller="Role" method="post">
+        <div class="card mt-2">
+            <div class="card-body">
+                <div class="form-group">
+                    <h5 class="card-title">
+                        <label for="name">Название</label>
+                    </h5>
+                    <input id="name" name="name" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <button class="btn btn-success btn-transparent rounded-pill" type="submit">Добавить</button>
+            <button class="btn btn-secondary btn-transparent rounded-pill" asp-action="Index">Отмена</button>
+        </div>
+        <br />
+    </form>
+</div>
