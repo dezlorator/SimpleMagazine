@@ -37,7 +37,7 @@ namespace PetStore.Controllers
         public async Task<ActionResult> Create() => Ok();
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name)
+        public async Task<IActionResult> Create([FromForm]string name)
         {
             if (!string.IsNullOrEmpty(name))
             {
@@ -58,7 +58,7 @@ namespace PetStore.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromForm]string id)
         {
             IdentityRole role = await _roleManager.FindByIdAsync(id);
             if (role != null)
@@ -75,7 +75,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("ModelForEdit")]
-        public async Task<IActionResult> Edit(string userId)
+        public async Task<IActionResult> Edit([FromForm]string userId)
         {
             // получаем пользователя
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
@@ -98,7 +98,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPut()]
-        public async Task<IActionResult> Edit(string userId, List<string> roles)
+        public async Task<IActionResult> Edit([FromForm]string userId, [FromForm]List<string> roles)
         {
             // получаем пользователя
             ApplicationUser user = await _userManager.FindByIdAsync(userId);

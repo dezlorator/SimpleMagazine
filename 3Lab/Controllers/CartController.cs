@@ -30,7 +30,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost()]
-        public async Task<ActionResult> AddToCart(int productId)
+        public async Task<ActionResult> AddToCart([FromForm]int productId)
         {
             Product product = _repository.Products
                 .FirstOrDefault(p => p.ID == productId);
@@ -43,7 +43,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("IncreaseQuantity")]
-        public async Task<ActionResult> IncreaseQuantity(int editedLineProductId)
+        public async Task<ActionResult> IncreaseQuantity([FromForm]int editedLineProductId)
         {
             var line = _cart.Lines.FirstOrDefault(l => l.Product.ID == editedLineProductId);
 
@@ -64,7 +64,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("ReduceQuantity")]
-        public async Task<ActionResult> ReduceQuantity(int editedLineProductId)
+        public async Task<ActionResult> ReduceQuantity([FromForm]int editedLineProductId)
         {
             var line = _cart.Lines.FirstOrDefault(l => l.Product.ID == editedLineProductId);
 
@@ -87,8 +87,8 @@ namespace PetStore.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult> RemoveFromCart(int productId,
-                string returnUrl)
+        public async Task<ActionResult> RemoveFromCart([FromForm]int productId,
+                [FromForm]string returnUrl)
         {
             Product product = _repository.Products
                 .FirstOrDefault(p => p.ID == productId);

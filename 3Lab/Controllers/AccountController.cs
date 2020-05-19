@@ -34,7 +34,7 @@ namespace PetStore.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult> Register([FromBody]RegisterModel model)
+        public async Task<ActionResult> Register([FromForm]RegisterModel model)
         {
             if (ModelState.IsValid)
             {
@@ -92,7 +92,7 @@ namespace PetStore.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody]LoginModel loginModel)
+        public async Task<IActionResult> Login([FromForm]LoginModel loginModel)
         {
             if (ModelState.IsValid)
             {

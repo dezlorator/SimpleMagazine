@@ -32,7 +32,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(CategoryViewModel categoryModel)
+        public async Task<ActionResult> Create([FromForm]CategoryViewModel categoryModel)
         {
             if (ModelState.IsValid)
             {
@@ -60,13 +60,13 @@ namespace PetStore.Controllers
             }
         }
 
-        public async Task<ActionResult> Edit(int categoryId)
+        public async Task<ActionResult> Edit([FromForm]int categoryId)
         {
             return Ok(_repository.Categories.FirstOrDefault(c => c.ID == categoryId));
         }
 
         [HttpPut]
-        public async Task<ActionResult> Edit(CategoryNode category, int id)
+        public async Task<ActionResult> Edit([FromForm]CategoryNode category, [FromForm]int id)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace PetStore.Controllers
         }
 
         [HttpDelete()]
-        public async Task<ActionResult> Delete(int categoryId)
+        public async Task<ActionResult> Delete([FromForm]int categoryId)
         {
             DeleteChildren(categoryId);
 
@@ -93,7 +93,7 @@ namespace PetStore.Controllers
             return Ok();
         }
 
-        public void DeleteChildren(int categoryId)
+        public void DeleteChildren([FromForm]int categoryId)
         {
             var category = _repository.Categories.FirstOrDefault(c => c.ID == categoryId);
 

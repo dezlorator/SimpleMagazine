@@ -43,7 +43,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> MarkShipped(int orderID)
+        public async Task<ActionResult> MarkShipped([FromForm]int orderID)
         {
             Order order = _repository.Orders
                 .FirstOrDefault(o => o.OrderID == orderID);
@@ -75,7 +75,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("cancel")]
-        public async Task<ActionResult> Cancel(int orderID)
+        public async Task<ActionResult> Cancel([FromForm]int orderID)
         {
             Order order = _repository.Orders
                 .FirstOrDefault(o => o.OrderID == orderID);
@@ -94,7 +94,7 @@ namespace PetStore.Controllers
         public async Task<ActionResult> Checkout() => Ok(new Order());
 
         [HttpPost("checkout")]
-        public async Task<ActionResult> Checkout(Order order)
+        public async Task<ActionResult> Checkout([FromForm]Order order)
         {
             if (_cart.Lines.Count() == 0)
             {

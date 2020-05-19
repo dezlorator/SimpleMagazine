@@ -51,7 +51,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("getAll")]
-        public async Task<ActionResult> List(FilterParametersProducts filter, int productPage = 1)
+        public async Task<ActionResult> List([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
             if (filter.Categories != null)
             {
@@ -111,7 +111,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("SearchList")]
-        public async Task<ActionResult> SearchList(FilterParametersProducts filter, int productPage = 1)
+        public async Task<ActionResult> SearchList([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
             var products = _repository.Products;
             products = _filterConditions.GetProducts(products, filter);
@@ -154,7 +154,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("GetInfo")]
-        public async Task<ActionResult> Info(int productId)
+        public async Task<ActionResult> Info([FromForm]int productId)
         {
             var result = _productExtendedRepository.ProductsExtended
                     .FirstOrDefault(p => p.Product.ID == productId);
@@ -173,7 +173,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("image")]
-        public async Task<ActionResult> GetImage(string id)
+        public async Task<ActionResult> GetImage([FromForm]string id)
         {
             var image = await _imagesDb.GetImage(id);
 
