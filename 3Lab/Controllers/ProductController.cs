@@ -13,7 +13,7 @@ using PetStore.Models.ViewModels;
 namespace PetStore.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -50,11 +50,20 @@ namespace PetStore.Controllers
             _filterConditions = filterConditions;
         }
 
-        [HttpGet("getAll")]
+        [HttpGet("GetAll")]
         public async Task<ActionResult> List([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
-            if (filter.Categories != null)
+            var categories = new List<int>();
+
+            if (filter.Categories != String.Empty)
             {
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
+
                 int addedCount = 0;
 
                 do
@@ -62,11 +71,11 @@ namespace PetStore.Controllers
                     addedCount = 0;
                     List<int> toAdd = new List<int>();
 
-                    foreach (int categoryID in filter.Categories)
+                    foreach (int categoryID in categories)
                     {
                         foreach (var id in _categoryRepository.Categories
                             .FirstOrDefault(c => c.ID == categoryID).Children
-                            .Where(c => !filter.Categories.Contains(c.ID))
+                            .Where(c => !categories.Contains(c.ID))
                             .Select(c => c.ID))
                         {
                             toAdd.Add(id);
@@ -74,7 +83,7 @@ namespace PetStore.Controllers
                         }
                     }
 
-                    filter.Categories.AddRange(toAdd);
+                    categories.AddRange(toAdd);
                 }
                 while (addedCount > 0);
             }
@@ -94,10 +103,10 @@ namespace PetStore.Controllers
             {
                 CurrentPage = productPage,
                 ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == null ?
+                TotalItems = filter.Categories == String.Empty ?
                         products.Count() :
                         products.Where(e =>
-                             filter.Categories.Contains(e.Category.ID)).Count()
+                             categories.Contains(e.Category.ID)).Count()
             };
 
             return Ok(new ProductsListViewModel
@@ -116,6 +125,14 @@ namespace PetStore.Controllers
             var products = _repository.Products;
             products = _filterConditions.GetProducts(products, filter);
 
+            var categories = new List<int>();
+            var categoriesStrings = filter.Categories.Split(';');
+
+            foreach (var category in categoriesStrings)
+            {
+                categories.Add(Convert.ToInt32(category));
+            }
+
             foreach (var p in products)
             {
                 if (_stockRepository.StockItems.FirstOrDefault(pr => pr.Product == p && pr.Quantity > 0) != null)
@@ -128,10 +145,10 @@ namespace PetStore.Controllers
             {
                 CurrentPage = productPage,
                 ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == null ?
+                TotalItems = filter.Categories == String.Empty ?
                         products.Count() :
                         products.Where(e =>
-                             filter.Categories.Contains(e.Category.ID)).Count()
+                             categories.Contains(e.Category.ID)).Count()
             };
 
             if (products.Count() == 0)
@@ -172,7 +189,7 @@ namespace PetStore.Controllers
             return Ok(result);
         }
 
-        [HttpGet("image")]
+        [HttpGet("Image")]
         public async Task<ActionResult> GetImage([FromForm]string id)
         {
             var image = await _imagesDb.GetImage(id);

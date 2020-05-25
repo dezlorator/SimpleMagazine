@@ -47,6 +47,14 @@ namespace PetStore.Controllers
         [HttpGet("GetData")]
         public async Task<ActionResult> Index([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
+            var categories = new List<int>();
+            var categoriesStrings = filter.Categories.Split(';');
+
+            foreach (var category in categoriesStrings)
+            {
+                categories.Add(Convert.ToInt32(category));
+            }
+
             var stock = _stockRepository.StockItems;
             stock = _filterConditions.GetStockProducts(stock, filter);
 
@@ -57,7 +65,7 @@ namespace PetStore.Controllers
                 TotalItems = filter.Categories == null ?
                         stock.Count() :
                         stock.Where(e =>
-                             filter.Categories.Contains(e.Product.Category.ID)).Count()
+                             categories.Contains(e.Product.Category.ID)).Count()
             };
 
             return Ok(new AdminProductsListViewModel
@@ -73,6 +81,14 @@ namespace PetStore.Controllers
         [HttpGet("SearchList")]
         public async Task<ActionResult> SearchList([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
+            var categories = new List<int>();
+            var categoriesStrings = filter.Categories.Split(';');
+
+            foreach (var category in categoriesStrings)
+            {
+                categories.Add(Convert.ToInt32(category));
+            }
+
             var stock = _stockRepository.StockItems;
             stock = _filterConditions.GetStockProducts(stock, filter);
 
@@ -83,7 +99,7 @@ namespace PetStore.Controllers
                 TotalItems = filter.Categories == null ?
                         stock.Count() :
                         stock.Where(e =>
-                             filter.Categories.Contains(e.Product.Category.ID)).Count()
+                             categories.Contains(e.Product.Category.ID)).Count()
             };
 
             if (stock.Count() == 0)

@@ -11,7 +11,15 @@ namespace PetStore.Filters
     {
         public IQueryable<Product> GetProducts(IQueryable<Product> products, FilterParametersProducts filter)
         {
-            products = products.Where(p => filter.Categories == null || filter.Categories.Contains(p.Category.ID));
+            var categories = new List<int>();
+            var categoriesStrings = filter.Categories.Split(';');
+
+            foreach (var category in categoriesStrings)
+            {
+                categories.Add(Convert.ToInt32(category));
+            }
+
+            products = products.Where(p => filter.Categories == null || categories.Contains(p.Category.ID));
 
             if (!String.IsNullOrEmpty(filter.Name))
             {
@@ -33,7 +41,15 @@ namespace PetStore.Filters
 
         public IQueryable<Stock> GetStockProducts(IQueryable<Stock> stockProducts, FilterParametersProducts filter)
         {
-            stockProducts = stockProducts.Where(p => filter.Categories == null || filter.Categories.Contains(p.Product.Category.ID));
+            var categories = new List<int>();
+            var categoriesStrings = filter.Categories.Split(';');
+
+            foreach (var category in categoriesStrings)
+            {
+                categories.Add(Convert.ToInt32(category));
+            }
+
+            stockProducts = stockProducts.Where(p => filter.Categories == null || categories.Contains(p.Product.Category.ID));
 
             if (!String.IsNullOrEmpty(filter.Name))
             {

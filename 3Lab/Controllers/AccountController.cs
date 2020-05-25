@@ -105,7 +105,7 @@ namespace PetStore.Controllers
 
                 var encodedJwt = _jwtTokenCryptographer.Encode(claims);
 
-                var response = new
+                var response = new LoginResponse
                 {
                     access_token = encodedJwt,
                     username = claims.Name

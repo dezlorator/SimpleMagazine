@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Client.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Cms;
+using Org.BouncyCastle.Ocsp;
 using PetStore.Filters;
 using PetStore.Filters.FilterParameters;
 using PetStore.Models;
@@ -15,154 +21,132 @@ namespace PetStore.Controllers
     {
         #region fields
 
-        private readonly ImagesDbContext _imagesDb;
-
-        private IProductRepository _repository;
-
-        private IStockRepository _stockRepository;
-
-        private IProductExtendedRepository _productExtendedRepository;
-
-        private ICategoryRepository _categoryRepository;
-
-        private IFilterConditionsProducts _filterConditions;
-
         public int PageSize = 4;
+        private readonly string _apiPathList = "https://localhost:44343/api/product/GetAll";
+        private readonly string _apiPathSearchList = "https://localhost:44343/api/product/SearchList";
+        private readonly string _apiPathInfo = "https://localhost:44343/api/product/GetInfo";
+        private readonly ImagesDbContext _imagesDb;
 
         #endregion
 
-        public ProductController(IProductRepository repository,
-                                IStockRepository stockRepository,
-                                IProductExtendedRepository productExtendedRepository,
-                                ICategoryRepository categoryRepository,
-                                ImagesDbContext context,
-                                IFilterConditionsProducts filterConditions)
+        public ProductController(ImagesDbContext context)
         {
-            _repository = repository;
-            _stockRepository = stockRepository;
-            _productExtendedRepository = productExtendedRepository;
-            _categoryRepository = categoryRepository;
             _imagesDb = context;
-            _filterConditions = filterConditions;
         }
 
-        public ViewResult List(FilterParametersProducts filter, int productPage = 1)
+        public async Task<ViewResult> List(FilterParametersProducts filter, int productPage = 1)
         {
-            if (filter.Categories != null)
+            try
             {
-                int addedCount = 0;
+                HttpResponseMessage response = null;
 
-                do
+                using (var httpClient = new HttpClient())
                 {
-                    addedCount = 0;
-                    List<int> toAdd = new List<int>();
+                    MultipartFormDataContent data = new MultipartFormDataContent();
 
-                    foreach (int categoryID in filter.Categories)
+                    data.Add(new StringContent(filter.Name), "Name");
+                    data.Add(new StringContent(filter.MinPrice.ToString()), "MinPrice");
+                    data.Add(new StringContent(filter.MaxPrice.ToString()), "MaxPrice");
+                    data.Add(new StringContent(filter.Category.ToString()), "Category");
+                    data.Add(new StringContent(productPage.ToString()), "productPage");
+
+                    string categoryCostyl = String.Empty;
+
+                    if (filter.Categories != null)
                     {
-                        foreach (var id in _categoryRepository.Categories
-                            .FirstOrDefault(c => c.ID == categoryID).Children
-                            .Where(c => !filter.Categories.Contains(c.ID))
-                            .Select(c => c.ID))
+                        foreach (var category in filter.Categories)
                         {
-                            toAdd.Add(id);
-                            addedCount++;
+                            categoryCostyl += category.ToString() + ';';
                         }
+
+                        categoryCostyl = categoryCostyl.Substring(0, categoryCostyl.Length - 2);
                     }
 
-                    filter.Categories.AddRange(toAdd);
-                }
-                while (addedCount > 0);
-            }
+                    data.Add(new StringContent(categoryCostyl), "Categories");
 
-            var products = _repository.Products;
-            products = _filterConditions.GetProducts(products, filter);
+               //     httpClient.DefaultRequestHeaders.Add("Authorization", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathList, data);
 
-            foreach (var p in products)
-            {
-                if (_stockRepository.StockItems.FirstOrDefault(pr => pr.Product == p && pr.Quantity > 0) != null)
-                {
-                    p.IsInStock = true;
+                    var json = await response.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<ProductsListViewModel>(json);
+
+                    return View(obj);
                 }
             }
-
-            var paging = new PagingInfo
+            catch (Exception)
             {
-                CurrentPage = productPage,
-                ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == null ?
-                        products.Count() :
-                        products.Where(e =>
-                             filter.Categories.Contains(e.Category.ID)).Count()
-            };
-
-            return View(new ProductsListViewModel
-            {
-                Products = products
-                    .Skip((productPage - 1) * PageSize)
-                    .Take(PageSize),
-                PagingInfo = paging,
-                CurrentFilter = filter
-            });
+                throw;
+            }
         }
 
-        public ViewResult SearchList(FilterParametersProducts filter, int productPage = 1)
+        public async Task<ViewResult> SearchList(FilterParametersProducts filter, int productPage = 1)
         {
-            var products = _repository.Products;
-            products = _filterConditions.GetProducts(products, filter);
-
-            foreach (var p in products)
+            try
             {
-                if (_stockRepository.StockItems.FirstOrDefault(pr => pr.Product == p && pr.Quantity > 0) != null)
+                HttpResponseMessage response = null;
+
+                using (var httpClient = new HttpClient())
                 {
-                    p.IsInStock = true;
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(filter.Name), "Name");
+                    data.Add(new StringContent(filter.MinPrice.ToString()), "MinPrice");
+                    data.Add(new StringContent(filter.MaxPrice.ToString()), "MaxPrice");
+                    data.Add(new StringContent(filter.Category.ToString()), "Category");
+                    data.Add(new StringContent(productPage.ToString()), "productPage");
+
+                    string categoryCostyl = String.Empty;
+
+                    if (filter.Categories != null)
+                    {
+                        foreach (var category in filter.Categories)
+                        {
+                            categoryCostyl += category.ToString() + ';';
+                        }
+
+                        categoryCostyl = categoryCostyl.Substring(0, categoryCostyl.Length - 2);
+                    }
+                    data.Add(new StringContent(categoryCostyl), "Categories");
+
+               //     httpClient.DefaultRequestHeaders.Add("Authorization", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathSearchList, data);
+
+                    var json = await response.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<ProductsListViewModel>(json);
+
+                    return View(obj);
                 }
             }
-
-            var paging = new PagingInfo
+            catch (Exception)
             {
-                CurrentPage = productPage,
-                ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == null ?
-                        products.Count() :
-                        products.Where(e =>
-                             filter.Categories.Contains(e.Category.ID)).Count()
-            };
-
-            if (products.Count() == 0)
-            {
-                TempData["message_search"] = $"Поиск не дал результатов";
+                throw;
             }
-
-            return View(new ProductsListViewModel
-            {
-                Products = products
-                    .Skip((productPage - 1) * PageSize)
-                    .Take(PageSize),
-                PagingInfo = paging,
-                CurrentFilter = filter,
-                Categories = _repository.Products
-                    .Select(x => x.Category)
-                    .Distinct()
-                    .OrderBy(x => x).ToList()
-            });
         }
 
-        public ViewResult Info(int productId)
+        public async Task<ViewResult> Info(int productId)
         {
-            var result = _productExtendedRepository.ProductsExtended
-                    .FirstOrDefault(p => p.Product.ID == productId);
-
-            if (result == null)
+            try
             {
-                RedirectToAction("List");
-            }
+                HttpResponseMessage response = null;
 
-            if (_stockRepository.StockItems.FirstOrDefault(p => p.Product.ID == result.Product.ID && p.Quantity > 0) != null)
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(productId.ToString()), "productId");
+
+                //    httpClient.DefaultRequestHeaders.Add("Authorization", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathInfo, data);
+
+                    var json = await response.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<ProductExtended>(json);
+
+                    return View(obj);
+                }
+            }
+            catch (Exception)
             {
-                result.Product.IsInStock = true;
+                throw;
             }
-
-            return View(result);
         }
 
         public async Task<ActionResult> GetImage(string id)
