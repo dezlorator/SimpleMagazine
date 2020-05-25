@@ -8,7 +8,6 @@ using PetStore.Models.ViewModels;
 
 namespace PetStore.Controllers
 {
-    [Authorize]
     public class CartController : Controller
     {
         #region fields

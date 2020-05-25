@@ -25,7 +25,7 @@
                     <input type="hidden" asp-for="ID" name="productId" />
                     <input type="hidden" name="returnUrl"
                            value="@ViewContext.HttpContext.Request.PathAndQuery()" />
-                    @if (User.Identity.IsAuthenticated)
+                    @if (Client.Models.TokenKeeper.Token != String.Empty)
                     {
                         if (Model.IsInStock)
                         {
