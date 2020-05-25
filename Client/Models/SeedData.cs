@@ -12,7 +12,7 @@ namespace PetStore.Models
         {
             ApplicationDbContext context = app.ApplicationServices
                 .GetRequiredService<ApplicationDbContext>();
-            context.Database.Migrate();
+           // context.Database.Migrate();
 
             if (!context.Products.Any() && !context.StockItems.Any())
             {

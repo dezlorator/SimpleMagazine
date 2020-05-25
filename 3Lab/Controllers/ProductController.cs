@@ -50,12 +50,12 @@ namespace PetStore.Controllers
             _filterConditions = filterConditions;
         }
 
-        [HttpGet("GetAll")]
+        [HttpPost("GetAll")]
         public async Task<ActionResult> List([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
             var categories = new List<int>();
 
-            if (filter.Categories != String.Empty)
+            if (filter.Categories != null)
             {
                 var categoriesStrings = filter.Categories.Split(';');
 
@@ -170,7 +170,7 @@ namespace PetStore.Controllers
             });
         }
 
-        [HttpGet("GetInfo")]
+        [HttpPost("GetInfo")]
         public async Task<ActionResult> Info([FromForm]int productId)
         {
             var result = _productExtendedRepository.ProductsExtended

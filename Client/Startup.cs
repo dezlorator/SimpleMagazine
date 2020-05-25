@@ -85,7 +85,7 @@ namespace PetStore
                 routes.MapRoute(name: null, template: "{controller}/{action}/{id?}");
             });
             SeedData.EnsurePopulated(app);
-            IdentitySeedData.EnsurePopulated(app);
+           // IdentitySeedData.EnsurePopulated(app);
         }
     }
 }

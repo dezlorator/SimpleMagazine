@@ -22,9 +22,9 @@ namespace PetStore.Controllers
         #region fields
 
         public int PageSize = 4;
-        private readonly string _apiPathList = "https://localhost:44343/api/product/GetAll";
-        private readonly string _apiPathSearchList = "https://localhost:44343/api/product/SearchList";
-        private readonly string _apiPathInfo = "https://localhost:44343/api/product/GetInfo";
+        private readonly string _apiPathList = "http://localhost:62029/api/product/GetAll";
+        private readonly string _apiPathSearchList = "http://localhost:62029/api/product/SearchList";
+        private readonly string _apiPathInfo = "http://localhost:62029/api/product/GetInfo";
         private readonly ImagesDbContext _imagesDb;
 
         #endregion
@@ -62,6 +62,7 @@ namespace PetStore.Controllers
                         categoryCostyl = categoryCostyl.Substring(0, categoryCostyl.Length - 2);
                     }
 
+                    
                     data.Add(new StringContent(categoryCostyl), "Categories");
 
                //     httpClient.DefaultRequestHeaders.Add("Authorization", TokenKeeper.Token);

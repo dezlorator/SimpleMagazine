@@ -12,11 +12,15 @@ namespace PetStore.Filters
         public IQueryable<Product> GetProducts(IQueryable<Product> products, FilterParametersProducts filter)
         {
             var categories = new List<int>();
-            var categoriesStrings = filter.Categories.Split(';');
 
-            foreach (var category in categoriesStrings)
+            if (filter.Categories != null)
             {
-                categories.Add(Convert.ToInt32(category));
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
             }
 
             products = products.Where(p => filter.Categories == null || categories.Contains(p.Category.ID));
@@ -42,11 +46,15 @@ namespace PetStore.Filters
         public IQueryable<Stock> GetStockProducts(IQueryable<Stock> stockProducts, FilterParametersProducts filter)
         {
             var categories = new List<int>();
-            var categoriesStrings = filter.Categories.Split(';');
 
-            foreach (var category in categoriesStrings)
+            if (filter.Categories != null)
             {
-                categories.Add(Convert.ToInt32(category));
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
             }
 
             stockProducts = stockProducts.Where(p => filter.Categories == null || categories.Contains(p.Product.Category.ID));

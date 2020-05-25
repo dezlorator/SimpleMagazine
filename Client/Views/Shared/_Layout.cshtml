@@ -20,11 +20,11 @@
         </a>
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="col navbar-nav">
-                @if (User.Identity.IsAuthenticated)
+                @if (Client.Models.TokenKeeper.Token != String.Empty)
                 {
                     <a class="nav-item nav-link @(ViewBag.Current == "MyOrders" ? "active" : "")" asp-action="MyList" asp-controller="Order">Мои заказы</a>
                 }
-                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                @if (Client.Models.TokenKeeper.Token != String.Empty/*User.IsInRole("Admin") || User.IsInRole("Manager")*/)
                 {
                     <a class="nav-item nav-link @(ViewBag.Current == "Orders" ? "active" : "")" asp-action="List" asp-controller="Order">Заказы</a>
                     <a class="nav-item nav-link @(ViewBag.Current == "OrdersShipped" ? "active" : "")" asp-action="ListShipped" asp-controller="Order">Обработанные заказы</a>
@@ -33,7 +33,7 @@
                     <a class="nav-item nav-link @(ViewBag.Current == "Statistics" ? "active" : "")" asp-action="Index" asp-controller="Statistics">Статистика</a>
 
                 }
-                @if (User.IsInRole("Admin"))
+                @if (Client.Models.TokenKeeper.Token != String.Empty/*User.IsInRole("Admin")*/)
                 {
                     <a class="nav-item nav-link @(ViewBag.Current == "Roles" ? "active" : "")" asp-action="Index" asp-controller="Role">Роли</a>
                     <a class="nav-item nav-link @(ViewBag.Current == "Users" ? "active" : "")" asp-action="UserList" asp-controller="Role">Пользователи</a>
@@ -50,7 +50,7 @@
                 </form>
             </div>
             <div class="col col-md-auto">
-                @if (User.Identity.IsAuthenticated)
+                @if (Client.Models.TokenKeeper.Token != String.Empty)
                 {
                     <div class="d-flex flex-row-reverse">
                         <a class="ml-2 btn rounded-pill btn-outline-light navbar-btn"

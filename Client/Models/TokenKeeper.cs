@@ -11,7 +11,7 @@ namespace Client.Models
 
         static TokenKeeper()
         {
-                
+            Token = String.Empty;
         }
     }
 }

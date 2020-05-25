@@ -8,10 +8,10 @@ namespace PetStore.Filters.FilterParameters
 {
     public class FilterParametersProducts
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }
         public int Category { get; set; }
-        public string Categories { get; set; } 
+        public string Categories { get; set; } = String.Empty;
     }
 }
