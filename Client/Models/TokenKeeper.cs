@@ -8,10 +8,12 @@ namespace Client.Models
     public static class TokenKeeper
     {
         public static string Token { get; set; }
+        public static string UserName { get; set; }
 
         static TokenKeeper()
         {
             Token = String.Empty;
+            UserName = String.Empty;
         }
     }
 }

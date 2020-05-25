@@ -153,7 +153,7 @@ namespace PetStore.Controllers
 
                         httpClient.DefaultRequestHeaders.Authorization =
                             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
-                        response = await httpClient.PostAsync(_apiPathEdit, data);
+                        response = await httpClient.PutAsync(_apiPathEdit, data);
 
                         return RedirectToAction("List");
                     }

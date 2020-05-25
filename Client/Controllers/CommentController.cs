@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Client.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PetStore.Models;
 using PetStore.Models.ViewModels;
 
@@ -11,44 +14,15 @@ namespace PetStore.Controllers
 {
     public class CommentController : Controller
     {
-        #region private
+        private readonly string _apiPathCreate = "http://localhost:62029/api/comment/Create";
+        private readonly string _apiPathGetModel = "http://localhost:62029/api/comment/GetModel";
+        private readonly string _apiPath = "http://localhost:62029/api/comment";
+        private readonly string _apiPathDelete = "http://localhost:62029/api/comment/Delete";
 
-        private readonly ICommentRepository _commentRepository;
-        private readonly IProductExtendedRepository _productExtendedRepository;
-       // private int PageSize = 4;
-
-        #endregion
-
-        public CommentController(ICommentRepository commentRepository, IProductExtendedRepository productExtendedRepository)
+        public CommentController()
         {
-            _commentRepository = commentRepository;
-            _productExtendedRepository = productExtendedRepository;
+
         }
-
-        //public ViewResult GetByProductId(int id, int commentPage = 1)
-        //{
-        //    var comments = _commentRepository.Сomment.Where(p => p.Product.ID == id);
-
-        //    if(comments.Count() == 0)
-        //    {
-        //        TempData["message_search"] = $"Поиск не дал результатов";
-        //    }
-
-        //    var paging = new PagingInfo
-        //    {
-        //        CurrentPage = commentPage,
-        //        ItemsPerPage = PageSize,
-        //        TotalItems = comments.Count()
-        //    };
-
-        //    var commentViewModel = new CommentViewModel()
-        //    {
-        //        Comments = comments,
-        //        PagingInfo = paging
-        //    };
-
-        //    return View(commentViewModel);
-        //}
 
         public ViewResult Create(int productId, string returnUrl) => View(new CommentViewModel
         {
@@ -57,114 +31,136 @@ namespace PetStore.Controllers
         });
 
         [HttpPost]
-        public IActionResult Create(CommentViewModel commentModel)
+        public async Task<IActionResult> Create(CommentViewModel commentModel)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (TokenKeeper.Token == String.Empty)
             {
                 return RedirectToAction("Login", "Account", new { commentModel.ReturnUrl });
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                var comment = new Comment
+                HttpResponseMessage response = null;
+
+                using (var httpClient = new HttpClient())
                 {
-                    Message = commentModel.Message,
-                    Rating = commentModel.Rating,
-                    Time = DateTime.Now,
-                    UserName = User.Identity.Name
-                };
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(commentModel.ID.ToString()), "ID");
+                    data.Add(new StringContent(commentModel.Message), "Message");
+                    data.Add(new StringContent(commentModel.ProductId.ToString()), "ProductId");
+                    data.Add(new StringContent(commentModel.Rating.ToString()), "Rating");
+                    data.Add(new StringContent(commentModel.Time.ToString()), "Time");
+                    data.Add(new StringContent(TokenKeeper.UserName), "UserName");
+                    data.Add(new StringContent(commentModel.ReturnUrl), "ReturnUrl");
 
-                _commentRepository.SaveComment(comment);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathCreate, data);
 
-                _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Product.ID == commentModel.ProductId)
-                    .Comments.Add(comment);
-                _productExtendedRepository.SaveChanges();
-
-                return Redirect(commentModel.ReturnUrl);
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        TempData["message"] = $"Ошибка";
+                    }
+                }
             }
-            else
+            catch (Exception)
             {
-                TempData["message"] = $"Ошибка";
-                return Redirect(commentModel.ReturnUrl);
+                throw;
             }
+
+            return Redirect(commentModel.ReturnUrl);
         }
 
-        public ViewResult Edit(int commentId, string returnUrl)
+        public async Task<ViewResult> Edit(int commentId, string returnUrl)
         {
-            var comment = _commentRepository.Сomment.FirstOrDefault(p => p.ID == commentId);
-            var productId = _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Comments.Any(c => c.ID == commentId)).Product.ID;
-
-            var result = new CommentViewModel
+            try
             {
-                ID = comment.ID,
-                Message = comment.Message,
-                ProductId = productId,
-                UserName = comment.UserName,
-                Rating = comment.Rating,
-                Time = comment.Time,
-                ReturnUrl = returnUrl
-            };
+                HttpResponseMessage response = null;
 
-            return View(result);
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(commentId.ToString()), "commentId");
+                    data.Add(new StringContent(returnUrl), "returnUrl");
+
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathGetModel, data);
+
+                    var json = await response.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<CommentViewModel>(json);
+
+                    return View(obj);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
-        public IActionResult Edit(CommentViewModel commentModel, int id)
+        public async Task<IActionResult> Edit(CommentViewModel commentModel, int id)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (TokenKeeper.Token == String.Empty)
             {
                 return RedirectToAction("Login", "Account", new { commentModel.ReturnUrl });
             }
 
-            if (User.Identity.Name != commentModel.UserName || !User.IsInRole("Admin"))
+            try
             {
-                TempData["message"] = $"Пользователь не имеет права редактировать комментарий";
+                HttpResponseMessage response = null;
 
-                return Redirect(commentModel.ReturnUrl);
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(id.ToString()), "id");
+                    data.Add(new StringContent(commentModel.Message), "Message");
+                    data.Add(new StringContent(commentModel.ProductId.ToString()), "ProductId");
+                    data.Add(new StringContent(commentModel.Rating.ToString()), "Rating");
+                    data.Add(new StringContent(commentModel.Time.ToString()), "Time");
+                    data.Add(new StringContent(commentModel.UserName), "UserName");
+                    data.Add(new StringContent(commentModel.ReturnUrl), "ReturnUrl");
+
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PutAsync(_apiPath, data);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        TempData["message"] = $"Ошибка";
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
 
-            if (ModelState.IsValid)
-            {
-                var repositoryComment = _productExtendedRepository.ProductsExtended
-                    .FirstOrDefault(p => p.Product.ID == commentModel.ProductId)
-                    .Comments.FirstOrDefault(p => p.ID == id);
-
-                repositoryComment.Message = commentModel.Message;
-                repositoryComment.Rating = commentModel.Rating;
-                repositoryComment.Time = DateTime.Now;
-
-                _productExtendedRepository.SaveChanges();
-
-                return Redirect(commentModel.ReturnUrl);
-            }
-            else
-            {
-                TempData["message"] = $"Ошибка";
-                return Redirect(commentModel.ReturnUrl);
-            }
+            return Redirect(commentModel.ReturnUrl);
         }
 
-        public IActionResult Delete(int commentId, string returnUrl)
+        public async Task<IActionResult> Delete(int commentId, string returnUrl)
         {
-            var productId = _productExtendedRepository.ProductsExtended
-                .FirstOrDefault(p => p.Comments.Any(c => c.ID == commentId)).Product.ID;
-            var comment = _commentRepository.DeleteComment(commentId);
-            _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Product.ID == productId)
-                .Comments.Remove(comment);
-
-            if (!User.Identity.IsAuthenticated)
+            try
             {
-                return RedirectToAction("Login", "Account", new { returnUrl });
-            }
+                HttpResponseMessage response = null;
 
-            if (User.Identity.Name != comment.UserName || !User.IsInRole("Admin"))
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(commentId.ToString()), "commentId");
+                    data.Add(new StringContent(returnUrl), "returnUrl");
+
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathDelete, data);
+                }
+            }
+            catch (Exception)
             {
-                TempData["message"] = $"Пользователь не имеет права удалять комментарий";
-
-                return Redirect(returnUrl);
+                throw;
             }
-
-            TempData["message"] = $"Комментарий удален";
 
             return Redirect(returnUrl);
         }

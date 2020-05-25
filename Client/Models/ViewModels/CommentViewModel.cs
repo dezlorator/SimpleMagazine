@@ -10,8 +10,6 @@ namespace PetStore.Models.ViewModels
 {
     public class CommentViewModel
     {
-        //public IEnumerable<Сomment> Comments { get; set; }
-        //public PagingInfo PagingInfo { get; set; }
         [BindNever]
         public int ID { get; set; }
         [Required(ErrorMessage = "Введите комментарий")]

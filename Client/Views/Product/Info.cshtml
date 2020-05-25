@@ -27,7 +27,7 @@
                     <input type="hidden" asp-for="Product.ID" name="productId" />
                     <input type="hidden" name="returnUrl"
                            value="@ViewContext.HttpContext.Request.PathAndQuery()" />
-                    @if (User.Identity.IsAuthenticated)
+                    @if (Client.Models.TokenKeeper.Token != String.Empty)
                     {
                         if (Model.Product.IsInStock)
                         {
@@ -104,7 +104,7 @@
                     <h6 class="card-subtitle mb-2 text-muted">@comment.Time</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Оценка: @comment.Rating</h6>
                     <p class="card-text">@comment.Message</p>
-                    @if (User.Identity.Name == comment.UserName || User.IsInRole("Admin"))
+                    @if (Client.Models.TokenKeeper.UserName == comment.UserName)
                     {
                         <a class="card-link" asp-action="Edit" asp-controller="Comment" asp-route-commentId="@comment.ID" asp-route-returnUrl="@ViewContext.HttpContext.Request.PathAndQuery()">Редактировать</a>
                         <a class="card-link" asp-action="Delete" asp-controller="Comment" asp-route-commentId="@comment.ID" asp-route-returnUrl="@ViewContext.HttpContext.Request.PathAndQuery()">Удалить</a>
@@ -112,7 +112,7 @@
                 </div>
             </div>
         }
-        @if (User.Identity.IsAuthenticated)
+        @if (Client.Models.TokenKeeper.Token != String.Empty)
         {
             <partial name="AddComment" model="new CommentViewModel { ProductId = Model.Product.ID, ReturnUrl =@ViewContext.HttpContext.Request.PathAndQuery() }" />
         }

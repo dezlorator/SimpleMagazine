@@ -66,7 +66,7 @@ namespace PetStore.Controllers
             return Ok(_repository.Categories.FirstOrDefault(c => c.ID == categoryId));
         }
 
-        [HttpPost("Edit")]
+        [HttpPut("Edit")]
         public async Task<ActionResult> Edit([FromForm]CategoryNode category, [FromForm]int id)
         {
             if (ModelState.IsValid)

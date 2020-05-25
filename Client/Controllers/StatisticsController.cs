@@ -8,56 +8,46 @@ using Microsoft.AspNetCore.Http;
 using System;
 using PetStore.Models.ViewModels;
 using System.Collections.Generic;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Client.Models;
 
 namespace PetStore.Controllers
 {
     public class StatisticsController : Controller
     {
-        private IStockRepository _stockRepository;
-        private IProductRepository _productRepository;
-        private IOrderRepository _orderRepository;
+        private readonly string _apiPath = "http://localhost:62029/api/statistics";
 
-        public StatisticsController(IProductRepository productRepository, 
-                                    IStockRepository stockRepository,
-                                    IOrderRepository orderRepository)
+        public StatisticsController()
         {
-            _productRepository = productRepository;
-            _stockRepository = stockRepository;
-            _orderRepository = orderRepository;
+
         }
 
-        [Authorize(Roles = "Admin, Manager")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewBag.Current = "Statistics";
 
-            var listModel = new List<CategoriesChartViewModel>();
-            var products = _productRepository.Products;
-            var orders = _orderRepository.Orders;
-            var categroies = products.Select(p => p.Category).Distinct();
-
-            foreach (var c in categroies)
+            try
             {
-                var model = new CategoriesChartViewModel();
+                HttpResponseMessage response = null;
 
-                var categoryItems = products.Where(p => p.Category.ID == c.ID);
-                foreach (var p in categoryItems)
+                using (var httpClient = new HttpClient())
                 {
-                    model.Charts.Add(new SimpleChartViewModel
-                    {
-                        DimensionOne = p.Name,
-                        Quantity = orders
-                            .Where(o => o.Lines
-                                .FirstOrDefault(i => i.Product == p) != null).Count()
-                    });
+                    httpClient.DefaultRequestHeaders.Authorization =
+                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.GetAsync(_apiPath);
+
+                    var json = await response.Content.ReadAsStringAsync();
+
+                    var obj = JsonConvert.DeserializeObject<List<CategoriesChartViewModel>>(json);
+
+                    return View(obj);
                 }
-
-                model.Category = c.Name;
-
-                listModel.Add(model);
             }
-
-            return View(listModel.OrderBy(i => i.Category).ToList());
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

@@ -105,6 +105,7 @@ namespace PetStore.Controllers
                             var json = await response.Content.ReadAsStringAsync();
                             var obj = JsonConvert.DeserializeObject<LoginResponse>(json);
                             TokenKeeper.Token = obj.access_token;
+                            TokenKeeper.UserName = obj.username;
 
                             return RedirectToAction("List", "Product");
                         }
@@ -125,6 +126,7 @@ namespace PetStore.Controllers
         public async Task<RedirectToActionResult> Logout()
         {
             TokenKeeper.Token = String.Empty;
+            TokenKeeper.UserName = String.Empty;
 
             return RedirectToAction("Login", "Account");
         }

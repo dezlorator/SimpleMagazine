@@ -29,7 +29,7 @@ namespace PetStore.Controllers
             _productExtendedRepository = productExtendedRepository;
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<ActionResult> Create([FromForm]CommentViewModel commentModel)
         {
             if (ModelState.IsValid)
@@ -56,7 +56,7 @@ namespace PetStore.Controllers
             }
         }
 
-        [HttpGet("getModel")]
+        [HttpPost("GetModel")]
         public async Task<ActionResult> Edit([FromForm]int commentId, [FromForm]string returnUrl)
         {
             var comment = _commentRepository.Сomment.FirstOrDefault(p => p.ID == commentId);
@@ -79,7 +79,7 @@ namespace PetStore.Controllers
         [HttpPut]
         public IActionResult Edit([FromForm]CommentViewModel commentModel, [FromForm]int id)
         {
-            if (this.GetUserName() != commentModel.UserName || !User.IsInRole("Admin"))
+            if (this.GetUserName() != commentModel.UserName)
             {
                 return BadRequest(commentModel.ReturnUrl);
             }
@@ -104,7 +104,7 @@ namespace PetStore.Controllers
             }
         }
 
-        [HttpDelete()]
+        [HttpPost("Delete")]
         public IActionResult Delete([FromForm]int commentId, [FromForm]string returnUrl)
         {
             var productId = _productExtendedRepository.ProductsExtended
