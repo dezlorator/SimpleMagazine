@@ -44,16 +44,22 @@ namespace PetStore.Controllers
             _filterConditions = filterConditions;
         }
 
-        [HttpGet("GetData")]
+        [HttpPost("GetData")]
         public async Task<ActionResult> Index([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
             var categories = new List<int>();
-            var categoriesStrings = filter.Categories.Split(';');
 
-            foreach (var category in categoriesStrings)
+            if (filter.Categories != null)
             {
-                categories.Add(Convert.ToInt32(category));
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
             }
+
+            filter.CategoriesList = categories;
 
             var stock = _stockRepository.StockItems;
             stock = _filterConditions.GetStockProducts(stock, filter);
@@ -78,15 +84,19 @@ namespace PetStore.Controllers
             });
         }
 
-        [HttpGet("SearchList")]
+        [HttpPost("SearchList")]
         public async Task<ActionResult> SearchList([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
         {
             var categories = new List<int>();
-            var categoriesStrings = filter.Categories.Split(';');
 
-            foreach (var category in categoriesStrings)
+            if (filter.Categories != null)
             {
-                categories.Add(Convert.ToInt32(category));
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
             }
 
             var stock = _stockRepository.StockItems;
@@ -121,7 +131,13 @@ namespace PetStore.Controllers
             });
         }
 
-        [HttpPost]
+        [HttpGet("GetCategories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            return Ok(_categoryRepository.Categories);
+        }
+
+        [HttpPost("Create")]
         public async Task<IActionResult> Create([FromForm]ProductWithCategoryViewModel productExtended)
         {
             if (ModelState.IsValid)

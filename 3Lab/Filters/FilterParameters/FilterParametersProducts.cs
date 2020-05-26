@@ -13,5 +13,6 @@ namespace PetStore.Filters.FilterParameters
         public decimal MaxPrice { get; set; }
         public int Category { get; set; }
         public string Categories { get; set; } = String.Empty;
+        public List<int> CategoriesList { get; set; }
     }
 }
