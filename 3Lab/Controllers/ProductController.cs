@@ -64,6 +64,8 @@ namespace PetStore.Controllers
                     categories.Add(Convert.ToInt32(category));
                 }
 
+                filter.CategoriesList = categories;
+
                 int addedCount = 0;
 
                 do
@@ -103,7 +105,7 @@ namespace PetStore.Controllers
             {
                 CurrentPage = productPage,
                 ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == String.Empty ?
+                TotalItems = filter.Categories == null ?
                         products.Count() :
                         products.Where(e =>
                              categories.Contains(e.Category.ID)).Count()
@@ -126,12 +128,17 @@ namespace PetStore.Controllers
             products = _filterConditions.GetProducts(products, filter);
 
             var categories = new List<int>();
-            var categoriesStrings = filter.Categories.Split(';');
-
-            foreach (var category in categoriesStrings)
+            if (filter.Categories != null)
             {
-                categories.Add(Convert.ToInt32(category));
+                var categoriesStrings = filter.Categories.Split(';');
+
+                foreach (var category in categoriesStrings)
+                {
+                    categories.Add(Convert.ToInt32(category));
+                }
             }
+
+            filter.CategoriesList = categories;
 
             foreach (var p in products)
             {
@@ -145,7 +152,7 @@ namespace PetStore.Controllers
             {
                 CurrentPage = productPage,
                 ItemsPerPage = PageSize,
-                TotalItems = filter.Categories == String.Empty ?
+                TotalItems = filter.Categories == null ?
                         products.Count() :
                         products.Where(e =>
                              categories.Contains(e.Category.ID)).Count()

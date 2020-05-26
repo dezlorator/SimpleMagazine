@@ -76,7 +76,7 @@ namespace PetStore.Controllers
 
                     if (obj.CurrentFilter.CategoriesList == null)
                     {
-                        obj.CurrentFilter.CategoriesList = new List<int>() { 1, 2, 3 };
+                        obj.CurrentFilter.CategoriesList = new List<int>();
                     }
 
                     return View(obj);
