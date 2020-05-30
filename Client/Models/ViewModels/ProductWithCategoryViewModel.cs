@@ -9,6 +9,6 @@ namespace PetStore.Models.ViewModels
     {
         public int ID { get; set; }
         public ProductExtended Product { get; set; }
-        public IQueryable<CategoryNode> Categories { get; set; }
+        public List<CategoryNode> Categories { get; set; }
     }
 }

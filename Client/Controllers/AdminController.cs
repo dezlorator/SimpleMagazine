@@ -19,15 +19,17 @@ namespace PetStore.Controllers
     public class AdminController : Controller
     {
         private readonly ImagesDbContext _imagesDb;
-        private int PageSize = 5;
+
+        private readonly string _apiPath = "http://localhost:62029/api/admin";
         private readonly string _apiPathGetData = "http://localhost:62029/api/admin/GetData";
         private readonly string _apiPathSearchList = "http://localhost:62029/api/admin/SearchList";
         private readonly string _apiPathGetCategories = "http://localhost:62029/api/admin/GetCategories";
         private readonly string _apiPathCreate = "http://localhost:62029/api/admin/Create";
+        private readonly string _apiPathEditModel = "http://localhost:62029/api/admin/EditModel";
+        private readonly string _apiPathDelete = "http://localhost:62029/api/admin/Delete";
+        private readonly string _apiPathAddToStock = "http://localhost:62029/api/admin/AddToStock";
+        private readonly string _apiPathAttachImage = "http://localhost:62029/api/admin/AttachImage";
 
-        private readonly string _apiPathGetModel = "http://localhost:62029/api/comment/GetModel";
-        private readonly string _apiPath = "http://localhost:62029/api/comment";
-        private readonly string _apiPathDelete = "http://localhost:62029/api/comment/Delete";
 
         public AdminController(ImagesDbContext context)
         {
@@ -160,7 +162,7 @@ namespace PetStore.Controllers
                     return View(new ProductWithCategoryViewModel
                     {
                         Product = new ProductExtended(),
-                        Categories = obj.AsQueryable()
+                        Categories = obj
                     });
                 }
             }
@@ -225,134 +227,190 @@ namespace PetStore.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin, Manager")]
-        //public IActionResult Edit(int productId)
-        //{
-        //    var result = _productExtendedRepository.ProductsExtended
-        //        .FirstOrDefault(p => p.Product.ID == productId);
+        public async Task<IActionResult> Edit(int productId)
+        {
+            try
+            {
+                HttpResponseMessage response = null;
 
-        //    if (result == null)
-        //    {
-        //        TempData["message"] = $"Ошибка";
-        //        return RedirectToAction("List");
-        //    }
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
 
-        //    return View(new ProductWithCategoryViewModel { Categories = _categoryRepository.Categories, Product = result });
-        //}
+                    data.Add(new StringContent(productId.ToString()), "productId");
 
-        //[HttpPost]
-        //[Authorize(Roles = "Admin, Manager")]
-        //public async Task<IActionResult> Edit(ProductWithCategoryViewModel productExtended, int id)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (productExtended.ID <= 0)
-        //        {
-        //            TempData["message"] = $"Ошибка сохранения";
-        //            return RedirectToAction("Index");
-        //        }
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathEditModel, data);
 
-        //        var product = _productExtendedRepository.ProductsExtended
-        //            .FirstOrDefault(p => p.ID == productExtended.ID);
+                    var json = await response.Content.ReadAsStringAsync();
+                    var obj = JsonConvert.DeserializeObject<ProductWithCategoryViewModel>(json);
 
-        //        if (productExtended.Product.Product.Image != null)
-        //        {
-        //            var imageName = DateTime.Now.ToString() + productExtended.Product.Product.Name;
-        //            var image = await _imagesDb.StoreImage(productExtended.Product.Product.Image.OpenReadStream(),
-        //                                                    imageName);
+                    return View(obj);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //            productExtended.Product.Product.ImageId = image;
-        //        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(ProductWithCategoryViewModel productExtended, int id)
+        {
+            try
+            {
+                HttpResponseMessage response = null;
 
-        //        product.Product.ID = productExtended.Product.ProductIdentifier;
-        //        product.Product.Name = productExtended.Product.Product.Name;
-        //        product.Product.ImageId = productExtended.Product.Product.ImageId;
-        //        product.Product.Price = productExtended.Product.Product.Price;
-        //        var category = _categoryRepository.Categories.FirstOrDefault(c => c.ID == productExtended.Product.Product.Category.ID);
-        //        product.Product.Category = category;
-        //        product.Product.Description = productExtended.Product.Product.Description;
-        //        product.LongDescription = productExtended.Product.LongDescription;
-        //        product.Manufacturer = productExtended.Product.Manufacturer;
-        //        product.OriginCountry = productExtended.Product.OriginCountry;
-        //        product.Image = productExtended.Product.Image;
-        //        product.Comments = productExtended.Product.Comments;
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
 
-        //        _productRepository.SaveProduct(product.Product);
-        //        _productExtendedRepository.SaveProductExtended(product);
-        //        TempData["message"] = $"{productExtended.Product.Product.Name} был сохранен";
+                    productExtended.Product.Product.ImageId = String.Empty;
 
-        //        return RedirectToAction("Index");
-        //    }
-        //    else
-        //    {
-        //        // there is something wrong with the data values
-        //        return View(productExtended);
-        //    }
-        //}
+                    if (productExtended.Product.Product.Image != null)
+                    {
+                        var imageName = DateTime.Now.ToString() + productExtended.Product.Product.Name;
+                        var image = await _imagesDb.StoreImage(productExtended.Product.Product.Image.OpenReadStream(),
+                                                                imageName);
 
-        //[HttpPost]
-        //[Authorize(Roles = "Admin")]
-        //public IActionResult Delete(int productId)
-        //{
-        //    List<int> ids = _orderRepository.Orders.Where(o => o.Lines.Any(l => l.Product.ID == productId)).Select(o => o.OrderID).ToList();
-        //    foreach (var id in ids)
-        //    {
-        //        var deletedOrder = _orderRepository.DeleteOrder(id);
-        //    }
+                        productExtended.Product.Product.ImageId = image;
+                    }
 
-        //    var stockId = _stockRepository.StockItems.FirstOrDefault(s => s.Product.ID == productId).ID;
-        //    var deletedStock = _stockRepository.DeleteStockItem(stockId);
+                    data.Add(new StringContent(id.ToString()), "ID");
+                    data.Add(new StringContent(productExtended.Product.ID.ToString()), "Product.ID");
+                    data.Add(new StringContent(productExtended.Product.ProductIdentifier.ToString()), "Product.ProductIdentifier");
+                    data.Add(new StringContent(productExtended.Product.LongDescription), "Product.LongDescription");
+                    data.Add(new StringContent(productExtended.Product.Manufacturer), "Product.Manufacturer");
+                    data.Add(new StringContent(productExtended.Product.OriginCountry), "Product.OriginCountry");
+                    data.Add(new StringContent(productExtended.Product.Product.ID.ToString()), "Product.Product.ID");
+                    data.Add(new StringContent(productExtended.Product.Product.Name), "Product.Product.Name");
+                    data.Add(new StringContent(productExtended.Product.Product.Description), "Product.Product.Description");
+                    data.Add(new StringContent(productExtended.Product.Product.Price.ToString()), "Product.Product.Price");
+                    data.Add(new StringContent(productExtended.Product.Product.ImageId), "Product.Product.ImageId");
+                    data.Add(new StringContent(productExtended.Product.Product.Category.ID.ToString()), "Product.Product.Category.ID");
 
-        //    var extendedId = _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Product.ID == productId).ID;
-        //    var deletedExtended = _productExtendedRepository.DeleteProductExtended(extendedId);
 
-        //    var deletedProduct = _productRepository.DeleteProduct(productId);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PutAsync(_apiPath, data);
 
-        //    if (deletedProduct != null && deletedStock != null && deletedExtended != null)
-        //    {
-        //        TempData["message"] = $"{deletedProduct.Name} был удален";
-        //    }
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        return View(productExtended);
+                    }
 
-        //    return RedirectToAction("Index");
-        //}
+                    TempData["message"] = $"{productExtended.Product.Product.Name} был сохранен";
 
-        //[HttpPost]
-        //[Authorize(Roles = "Admin, Manager")]
-        //public IActionResult AddToStock(int productId, int quantity)
-        //{
-        //    var stock = _stockRepository.StockItems.FirstOrDefault(s => s.Product.ID == productId);
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //    stock.Quantity += quantity;
-        //    _stockRepository.SaveStockItem(stock);
+        [HttpPost]
+        public async Task<IActionResult> Delete(int productId)
+        {
+            try
+            {
+                HttpResponseMessage response = null;
 
-        //    return RedirectToAction("Index");
-        //}
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(productId.ToString()), "productId");
 
-        //public async Task<ActionResult> GetImage(string id)
-        //{
-        //    var image = await _imagesDb.GetImage(id);
-        //    if (image == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return File(image, "image/png");
-        //}
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathDelete, data);
 
-        //[HttpPost]
-        //public async Task<ActionResult> AttachImage(int id, IFormFile uploadedFile)
-        //{
-        //    if (uploadedFile != null)
-        //    {
-        //        var image = await _imagesDb.StoreImage(uploadedFile.OpenReadStream(), uploadedFile.FileName);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        TempData["message"] = $"Товар был удален";
+                    }
 
-        //        Product product = _productRepository.Products.FirstOrDefault(p => p.ID == id);
-        //        product.ImageId = image;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //        _productRepository.SaveProduct(product);
-        //        TempData["message"] = $"{product.Name} был сохранен";
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> AddToStock(int productId, int quantity)
+        {
+            try
+            {
+                HttpResponseMessage response = null;
 
-        //    return RedirectToAction("Index");
-        //}
+                using (var httpClient = new HttpClient())
+                {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+                    data.Add(new StringContent(productId.ToString()), "productId");
+                    data.Add(new StringContent(quantity.ToString()), "quantity");
+
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                    response = await httpClient.PostAsync(_apiPathAddToStock, data);
+
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ActionResult> GetImage(string id)
+        {
+            var image = await _imagesDb.GetImage(id);
+            if (image == null)
+            {
+                return NotFound();
+            }
+            return File(image, "image/png");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AttachImage(int id, IFormFile uploadedFile)
+        {
+            if (uploadedFile != null)
+            {
+                var image = await _imagesDb.StoreImage(uploadedFile.OpenReadStream(), uploadedFile.FileName);
+
+                try
+                {
+                    HttpResponseMessage response = null;
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        MultipartFormDataContent data = new MultipartFormDataContent();
+                        data.Add(new StringContent(id.ToString()), "id");
+                        data.Add(new StringContent(image), "image");
+
+                        httpClient.DefaultRequestHeaders.Authorization =
+                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
+                        response = await httpClient.PostAsync(_apiPathAttachImage, data);
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            TempData["message"] = $"Товар был сохранен";
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }

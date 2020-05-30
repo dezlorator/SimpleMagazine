@@ -45,7 +45,7 @@
                 </thead>
                 @foreach (var item in Model.Stock)
                 {
-                    if (item != null)
+                    if (item != null && item.Product != null)
                     {
                         <tr>
                             <td class="text-right">@item.ID</td>
@@ -58,13 +58,10 @@
                                        asp-route-productId="@item.Product.ID">
                                         Редактировать
                                     </a>
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <input type="hidden" name="ProductID" value="@item.Product.ID" />
-                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill">
-                                            Удалить
-                                        </button>
-                                    }
+                                    <input type="hidden" name="ProductID" value="@item.Product.ID" />
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill">
+                                        Удалить
+                                    </button>
                                 </form>
                                 <form class="form-inline mt-2" asp-action="AddToStock" method="post">
                                     <input type="hidden" name="productId" value="@item.Product.ID" />

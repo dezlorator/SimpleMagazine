@@ -45,7 +45,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("GetData")]
-        public async Task<ActionResult> Index([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
+        public async Task<ActionResult> Index([FromForm] FilterParametersProducts filter, [FromForm] int productPage = 1)
         {
             var categories = new List<int>();
 
@@ -85,7 +85,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("SearchList")]
-        public async Task<ActionResult> SearchList([FromForm]FilterParametersProducts filter, [FromForm]int productPage = 1)
+        public async Task<ActionResult> SearchList([FromForm] FilterParametersProducts filter, [FromForm] int productPage = 1)
         {
             var categories = new List<int>();
 
@@ -138,7 +138,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromForm]ProductWithCategoryViewModel productExtended)
+        public async Task<IActionResult> Create([FromForm] ProductWithCategoryViewModel productExtended)
         {
             if (ModelState.IsValid)
             {
@@ -166,8 +166,8 @@ namespace PetStore.Controllers
             }
         }
 
-        [HttpGet("EditModel")]
-        public async Task<IActionResult> Edit([FromForm]int productId)
+        [HttpPost("EditModel")]
+        public async Task<IActionResult> Edit([FromForm] int productId)
         {
             var result = _productExtendedRepository.ProductsExtended
                 .FirstOrDefault(p => p.Product.ID == productId);
@@ -181,7 +181,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Edit([FromForm]ProductWithCategoryViewModel productExtended, [FromForm]int id)
+        public async Task<IActionResult> Edit([FromForm] ProductWithCategoryViewModel productExtended, [FromForm] int id)
         {
             if (ModelState.IsValid)
             {
@@ -227,8 +227,8 @@ namespace PetStore.Controllers
             }
         }
 
-        [HttpDelete()]
-        public IActionResult Delete([FromForm]int productId)
+        [HttpPost("Delete")]
+        public IActionResult Delete([FromForm] int productId)
         {
             List<int> ids = _orderRepository.Orders.Where(o => o.Lines.Any(l => l.Product.ID == productId)).Select(o => o.OrderID).ToList();
             foreach (var id in ids)
@@ -248,7 +248,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("AddToStock")]
-        public IActionResult AddToStock([FromForm]int productId, [FromForm]int quantity)
+        public IActionResult AddToStock([FromForm] int productId, [FromForm] int quantity)
         {
             var stock = _stockRepository.StockItems.FirstOrDefault(s => s.Product.ID == productId);
 
@@ -259,7 +259,7 @@ namespace PetStore.Controllers
         }
 
         [HttpGet("GetImage")]
-        public async Task<ActionResult> GetImage([FromForm]string id)
+        public async Task<ActionResult> GetImage([FromForm] string id)
         {
             var image = await _imagesDb.GetImage(id);
             if (image == null)
@@ -270,17 +270,12 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("AttachImage")]
-        public async Task<ActionResult> AttachImage([FromForm]int id, [FromForm]IFormFile uploadedFile)
+        public async Task<ActionResult> AttachImage([FromForm] int id, [FromForm] string image)
         {
-            if (uploadedFile != null)
-            {
-                var image = await _imagesDb.StoreImage(uploadedFile.OpenReadStream(), uploadedFile.FileName);
+            Product product = _productRepository.Products.FirstOrDefault(p => p.ID == id);
+            product.ImageId = image;
 
-                Product product = _productRepository.Products.FirstOrDefault(p => p.ID == id);
-                product.ImageId = image;
-
-                _productRepository.SaveProduct(product);
-            }
+            _productRepository.SaveProduct(product);
 
             return Ok();
         }
