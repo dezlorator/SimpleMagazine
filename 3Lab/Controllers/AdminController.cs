@@ -10,6 +10,7 @@ using PetStore.Filters.FilterParameters;
 using PetStore.Filters;
 using PetStore.Models.ViewModels;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace PetStore.Controllers
 {
@@ -217,8 +218,15 @@ namespace PetStore.Controllers
                 product.Image = productExtended.Product.Image;
                 product.Comments = productExtended.Product.Comments;
 
-                _productRepository.SaveProduct(product.Product);
-                _productExtendedRepository.SaveProductExtended(product);
+                try
+                {
+                    _productRepository.SaveProduct(product.Product);
+                    _productExtendedRepository.SaveProductExtended(product);
+                }
+                catch(DbUpdateConcurrencyException ex)
+                {
+                    return BadRequest("The product is already editing");
+                }
 
                 return Ok();
             }

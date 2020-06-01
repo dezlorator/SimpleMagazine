@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PetStore.Models;
 using PetStore.Models.ViewModels;
 
@@ -32,7 +33,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult> Create([FromForm]CategoryViewModel categoryModel)
+        public async Task<ActionResult> Create([FromForm] CategoryViewModel categoryModel)
         {
             if (ModelState.IsValid)
             {
@@ -61,21 +62,27 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("GetEdit")]
-        public async Task<ActionResult> Edit([FromForm]int categoryId)
+        public async Task<ActionResult> Edit([FromForm] int categoryId)
         {
             return Ok(_repository.Categories.FirstOrDefault(c => c.ID == categoryId));
         }
 
         [HttpPut("Edit")]
-        public async Task<ActionResult> Edit([FromForm]CategoryNode category, [FromForm]int id)
+        public async Task<ActionResult> Edit([FromForm] CategoryNode category, [FromForm] int id)
         {
             if (ModelState.IsValid)
             {
                 var cat = _repository.Categories.FirstOrDefault(c => c.ID == id);
                 cat.Name = category.Name;
-
-                _repository.SaveChanges();
-
+                try
+                {
+                    _repository.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    return BadRequest("The product is already editing");
+                }
+                
                 return Ok();
             }
             else
@@ -85,7 +92,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("Delete")]
-        public async Task<ActionResult> Delete([FromForm]int categoryId)
+        public async Task<ActionResult> Delete([FromForm] int categoryId)
         {
             DeleteChildren(categoryId);
 
@@ -94,7 +101,7 @@ namespace PetStore.Controllers
             return Ok();
         }
 
-        public void DeleteChildren([FromForm]int categoryId)
+        public void DeleteChildren([FromForm] int categoryId)
         {
             var category = _repository.Categories.FirstOrDefault(c => c.ID == categoryId);
 
