@@ -88,6 +88,8 @@ namespace PetStore.Controllers
                     categories.AddRange(toAdd);
                 }
                 while (addedCount > 0);
+
+                filter.CategoriesList = categories;
             }
 
             var products = _repository.Products;

@@ -41,7 +41,7 @@
                     <a class="nav-item nav-link @(ViewBag.Current == "Statistics" ? "active" : "")" asp-action="Index" asp-controller="Statistics">Статистика</a>
 
                 }
-                @if (Client.Models.TokenKeeper.Token != String.Empty/*User.IsInRole("Admin")*/)
+                @if (false/*Client.Models.TokenKeeper.Token != String.Empty/*User.IsInRole("Admin")*/)
                 {
                     <a class="nav-item nav-link @(ViewBag.Current == "Roles" ? "active" : "")" asp-action="Index" asp-controller="Role">Роли</a>
                     <a class="nav-item nav-link @(ViewBag.Current == "Users" ? "active" : "")" asp-action="UserList" asp-controller="Role">Пользователи</a>

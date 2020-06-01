@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PetStore.Controllers
 {
-    [Authorize]
     public class OrderController : Controller
     {
         #region fields
@@ -30,7 +29,6 @@ namespace PetStore.Controllers
             return View(_repository.Orders.Where(o => o.UserName == User.Identity.Name).OrderByDescending(o => o.Date));
         }
 
-        [Authorize(Roles = "Admin, Manager")]
         public ViewResult List()
         {
             ViewBag.Current = "Orders";
@@ -38,7 +36,6 @@ namespace PetStore.Controllers
             return View(_repository.Orders.Where(o => !o.Shipped && !o.Canceled).OrderByDescending(o => o.Date));
         }
 
-        [Authorize(Roles = "Admin, Manager")]
         public ViewResult ListShipped()
         {
             ViewBag.Current = "OrdersShipped";
@@ -47,7 +44,6 @@ namespace PetStore.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, Manager")]
         public IActionResult MarkShipped(int orderID)
         {
             Order order = _repository.Orders

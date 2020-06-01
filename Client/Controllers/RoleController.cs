@@ -10,7 +10,6 @@ using PetStore.Models.ViewModels;
 
 namespace PetStore.Controllers
 {
-    [Authorize(Roles = "Admin")]
     public class RoleController : Controller
     {
         #region fields

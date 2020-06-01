@@ -11,19 +11,19 @@ namespace PetStore.Filters
     {
         public IQueryable<Product> GetProducts(IQueryable<Product> products, FilterParametersProducts filter)
         {
-            var categories = new List<int>();
+            //var categories = new List<int>();
 
-            if (filter.Categories != null)
-            {
-                var categoriesStrings = filter.Categories.Split(';');
+            //if (filter.Categories != null)
+            //{
+            //    var categoriesStrings = filter.Categories.Split(';');
 
-                foreach (var category in categoriesStrings)
-                {
-                    categories.Add(Convert.ToInt32(category));
-                }
-            }
+            //    foreach (var category in categoriesStrings)
+            //    {
+            //        categories.Add(Convert.ToInt32(category));
+            //    }
+            //}
 
-            products = products.Where(p => filter.Categories == null || categories.Contains(p.Category.ID));
+            products = products.Where(p => filter.CategoriesList == null || filter.CategoriesList.Contains(p.Category.ID));
 
             if (!String.IsNullOrEmpty(filter.Name))
             {
@@ -45,19 +45,19 @@ namespace PetStore.Filters
 
         public IQueryable<Stock> GetStockProducts(IQueryable<Stock> stockProducts, FilterParametersProducts filter)
         {
-            var categories = new List<int>();
+            //var categories = new List<int>();
 
-            if (filter.Categories != null)
-            {
-                var categoriesStrings = filter.Categories.Split(';');
+            //if (filter.Categories != null)
+            //{
+            //    var categoriesStrings = filter.Categories.Split(';');
 
-                foreach (var category in categoriesStrings)
-                {
-                    categories.Add(Convert.ToInt32(category));
-                }
-            }
+            //    foreach (var category in categoriesStrings)
+            //    {
+            //        categories.Add(Convert.ToInt32(category));
+            //    }
+            //}
 
-            stockProducts = stockProducts.Where(p => filter.Categories == null || categories.Contains(p.Product.Category.ID));
+            stockProducts = stockProducts.Where(p => filter.CategoriesList == null || filter.CategoriesList.Contains(p.Product.Category.ID));
 
             if (!String.IsNullOrEmpty(filter.Name))
             {

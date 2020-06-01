@@ -57,9 +57,9 @@ namespace PetStore.Controllers
                 {
                     categories.Add(Convert.ToInt32(category));
                 }
-            }
 
-            filter.CategoriesList = categories;
+                filter.CategoriesList = categories;
+            }
 
             var stock = _stockRepository.StockItems;
             stock = _filterConditions.GetStockProducts(stock, filter);
@@ -97,6 +97,8 @@ namespace PetStore.Controllers
                 {
                     categories.Add(Convert.ToInt32(category));
                 }
+
+                filter.CategoriesList = categories;
             }
 
             var stock = _stockRepository.StockItems;

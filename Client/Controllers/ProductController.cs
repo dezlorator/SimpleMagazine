@@ -52,14 +52,22 @@ namespace PetStore.Controllers
 
                     string categoryCostyl = String.Empty;
 
-                    if (filter.Categories != null)
+                    if (filter.Category > 0)
                     {
-                        foreach (var category in filter.Categories)
+                        categoryCostyl += filter.Category.ToString() + ';';
+                    }
+
+                    if (filter.CategoriesList != null)
+                    {
+                        foreach (var category in filter.CategoriesList)
                         {
                             categoryCostyl += category.ToString() + ';';
                         }
+                    }
 
-                        categoryCostyl = categoryCostyl.Substring(0, categoryCostyl.Length - 2);
+                    if (!String.IsNullOrEmpty(categoryCostyl))
+                    {
+                        categoryCostyl = categoryCostyl.Substring(0, categoryCostyl.Length - 1);
                     }
 
                     
