@@ -13,7 +13,6 @@ using PetStore.Models.ViewModels;
 namespace PetStore.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -55,7 +54,7 @@ namespace PetStore.Controllers
         {
             var categories = new List<int>();
 
-            if (filter.Categories != null)
+            if (!String.IsNullOrEmpty(filter.Categories))
             {
                 var categoriesStrings = filter.Categories.Split(';');
 
@@ -130,7 +129,7 @@ namespace PetStore.Controllers
             products = _filterConditions.GetProducts(products, filter);
 
             var categories = new List<int>();
-            if (filter.Categories != null)
+            if (!String.IsNullOrEmpty(filter.Categories))
             {
                 var categoriesStrings = filter.Categories.Split(';');
 

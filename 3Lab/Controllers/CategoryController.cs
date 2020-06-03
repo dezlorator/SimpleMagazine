@@ -74,13 +74,14 @@ namespace PetStore.Controllers
             {
                 var cat = _repository.Categories.FirstOrDefault(c => c.ID == id);
                 cat.Name = category.Name;
+
                 try
                 {
                     _repository.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    return BadRequest("The product is already editing");
+                    return BadRequest("Информация сейчас редактируется другим пользователем. Пожалуйста, попробуйте позже.");
                 }
                 
                 return Ok();

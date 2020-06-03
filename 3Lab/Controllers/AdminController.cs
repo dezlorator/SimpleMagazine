@@ -154,7 +154,8 @@ namespace PetStore.Controllers
                     productExtended.Product.Product.ImageId = image;
                 }
 
-                productExtended.Product.Product.Category = _categoryRepository.Categories.FirstOrDefault(c => c.ID == productExtended.Product.Product.Category.ID);
+                productExtended.Product.Product.Category = _categoryRepository.Categories
+                    .FirstOrDefault(c => c.ID == productExtended.Product.Product.Category.ID);
 
                 _productExtendedRepository.SaveProductExtended(productExtended.Product);
 
@@ -164,7 +165,6 @@ namespace PetStore.Controllers
             }
             else
             {
-                // there is something wrong with the data values
                 return BadRequest(productExtended);
             }
         }

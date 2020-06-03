@@ -21,6 +21,7 @@ namespace PetStore.Models
         public string Image { get; set; }
         [NotMapped]
         public int ProductIdentifier { get; set; }
+        [NotMapped]
         [Timestamp]
         public byte[] RowVersion { get; set; }
     }

@@ -61,7 +61,7 @@ namespace PetStore.Controllers
                 }
                 catch
                 {
-                    return Ok("Бодя дай почту");
+                    return BadRequest();
                 }
 
             }
