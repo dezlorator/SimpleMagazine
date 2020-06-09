@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using _3Lab.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace PetStore.Models
         public byte[] Password { get; set; }
         public bool EmailConfirmed { get; set; }
         public DateTime Birthday { get; set; }
+        public UserRole Role { get; set; }
     }
 }
