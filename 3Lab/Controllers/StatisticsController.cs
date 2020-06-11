@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using System;
 using PetStore.Models.ViewModels;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using LearningEngine.Api.Extensions;
 
 namespace PetStore.Controllers
 {
@@ -19,19 +21,29 @@ namespace PetStore.Controllers
         private IStockRepository _stockRepository;
         private IProductRepository _productRepository;
         private IOrderRepository _orderRepository;
+        private ApplicationDbContext _context;
 
         public StatisticsController(IProductRepository productRepository, 
                                     IStockRepository stockRepository,
-                                    IOrderRepository orderRepository)
+                                    IOrderRepository orderRepository,
+                                    ApplicationDbContext context)
         {
             _productRepository = productRepository;
             _stockRepository = stockRepository;
             _orderRepository = orderRepository;
+            _context = context;
         }
 
         [HttpGet()]
         public async Task<ActionResult> Index()
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanViewStatistics == false)
+            {
+                return Forbid();
+            }
+
             var listModel = new List<CategoriesChartViewModel>();
             var products = _productRepository.Products;
             var orders = _orderRepository.Orders;

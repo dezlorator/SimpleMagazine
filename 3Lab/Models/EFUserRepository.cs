@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using _3Lab.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
 using PetStore.Models;
 using System;
@@ -19,10 +20,14 @@ namespace _3Lab.Models
 
         public async Task RegisterUser(ApplicationUser applicationUser)
         {
-            await _context.Users.AddAsync(applicationUser);
+            var userRole = new UserRole();
+            _context.UserRole.Add(userRole);
+            await _context.SaveChangesAsync();
+            applicationUser.Role = userRole;
+            _context.Users.Add(applicationUser);
             try
             {
-                var result = await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch(Exception e)
             {
@@ -53,6 +58,22 @@ namespace _3Lab.Models
         public async Task DeleteUser(ApplicationUser user)
         {
             _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserRole(ChangeUserPermissionViewModel userRole)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userRole.UserId);
+            user.Role.CanAddComments = userRole.CanAddComments;
+            user.Role.CanAddProducts = userRole.CanAddProducts;
+            user.Role.CanDeleteProducts = userRole.CanDeleteProducts;
+            user.Role.CanEditProducts = userRole.CanEditProducts;
+            user.Role.CanModerateComments = userRole.CanModerateComments;
+            user.Role.CanPurchaseToStock = userRole.CanPurchaseToStock;
+            user.Role.CanSetRoles = userRole.CanSetRoles;
+            user.Role.CanViewStatistics = userRole.CanViewStatistics;
+            user.Role.CanViewUsersList = userRole.CanViewUsersList;
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
     }

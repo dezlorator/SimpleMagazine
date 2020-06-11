@@ -11,6 +11,10 @@ using PetStore.Filters;
 using PetStore.Models.ViewModels;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using _3Lab.Models.ViewModels;
+using _3Lab.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using LearningEngine.Api.Extensions;
 
 namespace PetStore.Controllers
 {
@@ -25,17 +29,22 @@ namespace PetStore.Controllers
         private IProductExtendedRepository _productExtendedRepository;
         private IOrderRepository _orderRepository;
         private ICategoryRepository _categoryRepository;
+        private ApplicationDbContext _context;
+        private IEFUserRepository _userRepository;
         private IFilterConditionsProducts _filterConditions;
         private int PageSize = 5;
 
         public AdminController(IProductRepository repo,
+                               IEFUserRepository userRepository,
                                IStockRepository stockRepo,
                                IProductExtendedRepository productExtendedRepository,
                                IOrderRepository orderRepository,
                                ICategoryRepository categoryRepository,
                                ImagesDbContext context,
-                               IFilterConditionsProducts filterConditions)
+                               IFilterConditionsProducts filterConditions,
+                               ApplicationDbContext dbcontext)
         {
+            _context = dbcontext;
             _productRepository = repo;
             _stockRepository = stockRepo;
             _productExtendedRepository = productExtendedRepository;
@@ -43,6 +52,7 @@ namespace PetStore.Controllers
             _categoryRepository = categoryRepository;
             _imagesDb = context;
             _filterConditions = filterConditions;
+            _userRepository = userRepository;
         }
 
         [HttpPost("GetData")]
@@ -143,6 +153,13 @@ namespace PetStore.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromForm] ProductWithCategoryViewModel productExtended)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanAddProducts == false)
+            {
+                return Forbid();
+            }
+
             if (ModelState.IsValid)
             {
                 if (productExtended.Product.Product.Image != null)
@@ -186,6 +203,14 @@ namespace PetStore.Controllers
         [HttpPut]
         public async Task<IActionResult> Edit([FromForm] ProductWithCategoryViewModel productExtended, [FromForm] int id)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanEditProducts == false)
+            {
+                return Forbid();
+            }
+
+
             if (ModelState.IsValid)
             {
                 if (productExtended.ID <= 0)
@@ -238,8 +263,15 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("Delete")]
-        public IActionResult Delete([FromForm] int productId)
+        public async Task<IActionResult> Delete([FromForm] int productId)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanDeleteProducts == false)
+            {
+                return Forbid();
+            }
+
             List<int> ids = _orderRepository.Orders.Where(o => o.Lines.Any(l => l.Product.ID == productId)).Select(o => o.OrderID).ToList();
             foreach (var id in ids)
             {
@@ -258,8 +290,15 @@ namespace PetStore.Controllers
         }
 
         [HttpPost("AddToStock")]
-        public IActionResult AddToStock([FromForm] int productId, [FromForm] int quantity)
+        public async Task<IActionResult> AddToStock([FromForm] int productId, [FromForm] int quantity)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanPurchaseToStock == false)
+            {
+                return Forbid();
+            }
+
             var stock = _stockRepository.StockItems.FirstOrDefault(s => s.Product.ID == productId);
 
             stock.Quantity += quantity;

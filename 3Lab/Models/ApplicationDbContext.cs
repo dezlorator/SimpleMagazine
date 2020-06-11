@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using _3Lab.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +16,7 @@ namespace PetStore.Models
         public DbSet<ProductExtended> ProductsExtended { get; set; }
         public DbSet<CategoryNode> Categories { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
         #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

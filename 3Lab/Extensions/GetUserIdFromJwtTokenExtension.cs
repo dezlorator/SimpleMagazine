@@ -26,5 +26,11 @@ namespace LearningEngine.Api.Extensions
         {
             return httpContext.User.Claims.ElementAt(_userNamePosition).Value;
         }
+        public static int GetUserRole(this ControllerBase httpContext)
+        {
+            int.TryParse(httpContext.User.Claims.ElementAt(3).Value, out int result);
+
+            return result;
+        }
     }
 }

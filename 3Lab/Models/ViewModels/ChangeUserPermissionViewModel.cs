@@ -1,14 +1,13 @@
-﻿using PetStore.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _3Lab.Models
+namespace _3Lab.Models.ViewModels
 {
-    public class UserRole
+    public class ChangeUserPermissionViewModel
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
         public bool CanAddComments { get; set; } = true;
         public bool CanModerateComments { get; set; }
         public bool CanEditProducts { get; set; }
@@ -17,8 +16,6 @@ namespace _3Lab.Models
         public bool CanAddProducts { get; set; }
         public bool CanViewStatistics { get; set; }
         public bool CanViewUsersList { get; set; }
-        public bool CanDeleteUsers { get; set; }
         public bool CanSetRoles { get; set; }
-        public ApplicationUser User { get; set; }
     }
 }

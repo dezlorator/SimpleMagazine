@@ -16,5 +16,6 @@ namespace PetStore.Models
         public bool EmailConfirmed { get; set; }
         public DateTime Birthday { get; set; }
         public UserRole Role { get; set; }
+        public int RoleId { get; set; }
     }
 }

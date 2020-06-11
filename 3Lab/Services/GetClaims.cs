@@ -34,7 +34,8 @@ namespace _3Lab.Services
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
                     new Claim("UserId", user.Id.ToString()),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, "user")
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, "user"),
+                    new Claim("RoleId", user.RoleId.ToString())
                 };
                 ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
                 return Task.Run(() => claimsIdentity);

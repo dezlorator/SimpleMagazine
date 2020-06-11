@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetStore.Models;
 
 namespace _3Lab.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200609170124_RolesImplimented")]
+    partial class RolesImplimented
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +40,7 @@ namespace _3Lab.Migrations
                     b.Property<byte[]>("Password")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
@@ -46,8 +48,7 @@ namespace _3Lab.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId")
-                        .IsUnique();
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -283,9 +284,6 @@ namespace _3Lab.Migrations
                     b.Property<bool>("CanDeleteProducts")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("CanDeleteUsers")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("CanEditProducts")
                         .HasColumnType("bit");
 
@@ -312,10 +310,8 @@ namespace _3Lab.Migrations
             modelBuilder.Entity("PetStore.Models.ApplicationUser", b =>
                 {
                     b.HasOne("_3Lab.Models.UserRole", "Role")
-                        .WithOne("User")
-                        .HasForeignKey("PetStore.Models.ApplicationUser", "RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("PetStore.Models.CartLine", b =>

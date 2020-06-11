@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LearningEngine.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PetStore.Models;
 using PetStore.Models.ViewModels;
 
@@ -19,19 +20,29 @@ namespace PetStore.Controllers
 
         private readonly ICommentRepository _commentRepository;
         private readonly IProductExtendedRepository _productExtendedRepository;
-       // private int PageSize = 4;
+        private ApplicationDbContext _context;
+        // private int PageSize = 4;
 
         #endregion
 
-        public CommentController(ICommentRepository commentRepository, IProductExtendedRepository productExtendedRepository)
+        public CommentController(ICommentRepository commentRepository, IProductExtendedRepository productExtendedRepository,
+                    ApplicationDbContext context)
         {
             _commentRepository = commentRepository;
             _productExtendedRepository = productExtendedRepository;
-        }
+            _context = context;
+    }
 
         [HttpPost("Create")]
         public async Task<ActionResult> Create([FromForm]CommentViewModel commentModel)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if(role.CanAddComments == false)
+            {
+                return Forbid();
+            }
+
             if (ModelState.IsValid)
             {
                 var comment = new Comment
@@ -59,6 +70,13 @@ namespace PetStore.Controllers
         [HttpPost("GetModel")]
         public async Task<ActionResult> Edit([FromForm]int commentId, [FromForm]string returnUrl)
         {
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (role.CanModerateComments == false)
+            {
+                return Forbid();
+            }
+
             var comment = _commentRepository.Сomment.FirstOrDefault(p => p.ID == commentId);
             var productId = _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Comments.Any(c => c.ID == commentId)).Product.ID;
 
