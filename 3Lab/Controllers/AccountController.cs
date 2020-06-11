@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using _3Lab.Models;
 using _3Lab.Services;
 using LearningEngine.Api.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace PetStore.Controllers
 {
@@ -20,16 +21,19 @@ namespace PetStore.Controllers
         private IEFUserRepository _userRepository;
         private IJwtTokenCryptographer _jwtTokenCryptographer;
         private IGetClaims _getClaims;
+        private ApplicationDbContext _context;
 
         public AccountController(IPasswordHasher passwordHasher,
                 IEFUserRepository userRepository,
                 IJwtTokenCryptographer JwtTokenCryptographer,
-                IGetClaims getClaims)
+                IGetClaims getClaims,
+                ApplicationDbContext context)
         {
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
             _jwtTokenCryptographer = JwtTokenCryptographer;
             _getClaims = getClaims;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -105,10 +109,15 @@ namespace PetStore.Controllers
 
                 var encodedJwt = _jwtTokenCryptographer.Encode(claims);
 
+                var user = await _userRepository.FindByNameAsync(loginModel.Name);
+                var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == user.RoleId);
+                role.User = null;
+
                 var response = new LoginResponse
                 {
                     access_token = encodedJwt,
-                    username = claims.Name
+                    username = claims.Name,
+                    Role = role
                 };
 
                 return Ok(response);
