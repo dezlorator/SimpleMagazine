@@ -17,5 +17,6 @@ namespace Client.Models.ViewModels
         public bool CanViewStatistics { get; set; }
         public bool CanViewUsersList { get; set; }
         public bool CanSetRoles { get; set; }
+        public bool CanManageOrders { get; set; }
     }
 }

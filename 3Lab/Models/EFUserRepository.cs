@@ -73,6 +73,7 @@ namespace _3Lab.Models
             user.Role.CanSetRoles = userRole.CanSetRoles;
             user.Role.CanViewStatistics = userRole.CanViewStatistics;
             user.Role.CanViewUsersList = userRole.CanViewUsersList;
+            user.Role.CanManageOrders = userRole.CanManageOrders;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }

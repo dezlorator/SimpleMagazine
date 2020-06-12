@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PetStore.Models.ApplicationUser>
+﻿@model Client.Models.ViewModels.ApplicationUserViewModel
 @{
     ViewBag.Title = "Пользователи";
     Layout = "_AdminLayout";
@@ -12,19 +12,32 @@
                 <thead>
                     <tr>
                         <th>Пользователь</th>
-                        <th>Права доступа</th>
+                        <th>Email</th>
+                        @if (Client.Models.TokenKeeper.Permissions.CanSetRoles)
+                        {
+                            <th>Права доступа</th>
+                        }
                     </tr>
                 </thead>
-                @foreach (var user in Model)
+                @foreach (var user in Model.ApplicationUsers)
                 {
                     <tr>
+                        <td>@user.UserName</td>
                         <td>@user.Email</td>
-                        <td style="width:15%">
-                            <a class="btn btn-sm btn-primary rounded-pill" asp-action="Edit" asp-route-userId="@user.Id">Права доступа</a>
-                        </td>
+                        @if (Client.Models.TokenKeeper.Permissions.CanSetRoles)
+                        {
+                            <td style="width:15%">
+                                <a class="btn btn-sm btn-primary rounded-pill" asp-action="Edit" asp-route-userId="@user.Id">Права доступа</a>
+                            </td>
+                        }
                     </tr>
                 }
             </table>
         </div>
+    </div>
+    <div page-model="@Model.PagingInfo" page-action="List" page-classes-enabled="true"
+         page-class="btn" page-class-normal="btn-light"
+         page-class-selected="btn-primary"
+         class="btn-group mt-2">
     </div>
 </div>

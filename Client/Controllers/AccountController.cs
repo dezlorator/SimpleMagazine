@@ -107,6 +107,7 @@ namespace PetStore.Controllers
                             TokenKeeper.Token = obj.access_token;
                             TokenKeeper.UserName = obj.username;
                             TokenKeeper.Permissions = obj.Role;
+                            TokenKeeper.UserId = obj.UserId;
 
                             return RedirectToAction("List", "Product");
                         }

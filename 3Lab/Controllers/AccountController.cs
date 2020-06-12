@@ -117,6 +117,7 @@ namespace PetStore.Controllers
                 {
                     access_token = encodedJwt,
                     username = claims.Name,
+                    UserId = user.Id,
                     Role = role
                 };
 

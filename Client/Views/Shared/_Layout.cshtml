@@ -23,11 +23,13 @@
                 @if (Client.Models.TokenKeeper.Token != String.Empty)
                 {
                     <a class="nav-item nav-link @(ViewBag.Current == "MyOrders" ? "active" : "")" asp-action="MyList" asp-controller="Order">Мои заказы</a>
-
-                    @if (Client.Models.TokenKeeper.Permissions.CanEditProducts)
+                    @if (Client.Models.TokenKeeper.Permissions.CanManageOrders)
                     {
                         <a class="nav-item nav-link @(ViewBag.Current == "Orders" ? "active" : "")" asp-action="List" asp-controller="Order">Заказы</a>
                         <a class="nav-item nav-link @(ViewBag.Current == "OrdersShipped" ? "active" : "")" asp-action="ListShipped" asp-controller="Order">Обработанные заказы</a>
+                    }
+                    @if (Client.Models.TokenKeeper.Permissions.CanEditProducts)
+                    {
                         <a class="nav-item nav-link @(ViewBag.Current == "Products" ? "active" : "")" asp-action="Index" asp-controller="Admin">Товары</a>
                         <a class="nav-item nav-link @(ViewBag.Current == "Categories" ? "active" : "")" asp-action="List" asp-controller="Category">Категории</a>
                     }
@@ -35,7 +37,7 @@
                     {
                         <a class="nav-item nav-link @(ViewBag.Current == "Statistics" ? "active" : "")" asp-action="Index" asp-controller="Statistics">Статистика</a>
                     }
-                    @if (true/*Client.Models.TokenKeeper.Token != String.Empty/*User.IsInRole("Admin")*/)
+                    @if (Client.Models.TokenKeeper.Permissions.CanViewUsersList)
                     {
                         <a class="nav-item nav-link @(ViewBag.Current == "Users" ? "active" : "")" asp-action="Index" asp-controller="User">Пользователи</a>
                     }

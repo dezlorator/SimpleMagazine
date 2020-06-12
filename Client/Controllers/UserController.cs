@@ -24,7 +24,7 @@ namespace PetStore.Controllers
 
         }
 
-        public async Task<ViewResult> Index()//(FilterParametersProducts filter, int productPage = 1)
+        public async Task<ViewResult> Index(int productPage = 1)
         {
             ViewBag.Current = "Users";
 
@@ -34,13 +34,17 @@ namespace PetStore.Controllers
 
                 using (var httpClient = new HttpClient())
                 {
+                    MultipartFormDataContent data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(productPage.ToString()), "productPage");
+
                     httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
 
-                    response = await httpClient.GetAsync(_apiPathGetAll);
+                    response = await httpClient.PostAsync(_apiPathGetAll, data);
 
                     var json = await response.Content.ReadAsStringAsync();
-                    var obj = JsonConvert.DeserializeObject<ApplicationUser>(json);
+                    var obj = JsonConvert.DeserializeObject<ApplicationUserViewModel>(json);
 
                     return View(obj);
                 }
@@ -80,7 +84,7 @@ namespace PetStore.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(ChangeUserPermissionViewModel permissions, int userId)
+        public async Task<IActionResult> Edit([FromForm] ChangeUserPermissionViewModel permissions, int userId)
         {
             try
             {
@@ -100,6 +104,7 @@ namespace PetStore.Controllers
                     data.Add(new StringContent(permissions.CanViewStatistics.ToString()), "CanViewStatistics");
                     data.Add(new StringContent(permissions.CanViewUsersList.ToString()), "CanViewUsersList");
                     data.Add(new StringContent(permissions.CanSetRoles.ToString()), "CanSetRoles");
+                    data.Add(new StringContent(permissions.CanManageOrders.ToString()), "CanManageOrders");
 
                     httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenKeeper.Token);
@@ -113,6 +118,18 @@ namespace PetStore.Controllers
                     }
 
                     TempData["message"] = $"Разрешения пользователя обновлены";
+
+                    if (TokenKeeper.UserId == permissions.UserId)
+                    {
+                        TokenKeeper.Permissions.CanAddComments = permissions.CanAddComments;
+                        TokenKeeper.Permissions.CanModerateComments = permissions.CanModerateComments;
+                        TokenKeeper.Permissions.CanEditProducts = permissions.CanEditProducts;
+                        TokenKeeper.Permissions.CanPurchaseToStock = permissions.CanPurchaseToStock;
+                        TokenKeeper.Permissions.CanDeleteProducts = permissions.CanDeleteProducts;
+                        TokenKeeper.Permissions.CanAddComments = permissions.CanAddComments;
+                        TokenKeeper.Permissions.CanViewStatistics = permissions.CanViewStatistics;
+                        TokenKeeper.Permissions.CanManageOrders = permissions.CanManageOrders;
+                    }
 
                     return RedirectToAction("Index");
                 }

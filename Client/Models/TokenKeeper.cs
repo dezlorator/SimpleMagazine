@@ -9,6 +9,7 @@ namespace Client.Models
     public static class TokenKeeper
     {
         public static string Token { get; set; }
+        public static int UserId { get; set; }
         public static string UserName { get; set; }
         public static UserRole Permissions { get; set; }
 

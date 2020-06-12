@@ -19,6 +19,7 @@ namespace _3Lab.Models
         public bool CanViewUsersList { get; set; }
         public bool CanDeleteUsers { get; set; }
         public bool CanSetRoles { get; set; }
+        public bool CanManageOrders { get; set; }
         public ApplicationUser User { get; set; }
     }
 }

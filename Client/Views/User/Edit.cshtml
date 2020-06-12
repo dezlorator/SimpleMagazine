@@ -1,0 +1,75 @@
+﻿@model Client.Models.ViewModels.ChangeUserPermissionViewModel
+@{
+    ViewBag.Title = "Пользователи";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid w-50">
+    <div class="card mt-2">
+        <div class="card-body">
+            <h5 class="card-title">
+                Редактирование прав доступа
+            </h5>
+            <p class="card-text">Здесь можно установить разрешения пользователя.</p>
+        </div>
+    </div>
+
+    <form asp-action="Edit" asp-controller="User" method="post">
+        <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+        <div class="card mt-2">
+            <div class="card-body">
+                <h6>Комментарии</h6>
+                <div class="form-check">
+                    <input asp-for="CanAddComments" class="form-check-input" placeholder="@Model.CanAddComments" />
+                    <label asp-for="CanAddComments" class="form-check-label">Может добавлять комментарии</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="CanModerateComments" class="form-check-input" placeholder="@Model.CanModerateComments" />
+                    <label asp-for="CanModerateComments" class="form-check-label">Может модерировать комментарии</label>
+                </div>
+                <h6>Заказы</h6>
+                <div class="form-check">
+                    <input asp-for="CanManageOrders" class="form-check-input" placeholder="@Model.CanManageOrders" />
+                    <label asp-for="CanManageOrders" class="form-check-label">Может управлять заказами</label>
+                </div>
+                <h6>Товары</h6>
+                <div class="form-check">
+                    <input asp-for="CanEditProducts" class="form-check-input" placeholder="@Model.CanEditProducts" />
+                    <label asp-for="CanEditProducts" class="form-check-label">Может редактировать товары и категории</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="CanPurchaseToStock" class="form-check-input" placeholder="@Model.CanPurchaseToStock" />
+                    <label asp-for="CanPurchaseToStock" class="form-check-label">Может заказывать товары на склад</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="CanDeleteProducts" class="form-check-input" placeholder="@Model.CanDeleteProducts" />
+                    <label asp-for="CanDeleteProducts" class="form-check-label">Может удалять товары и категории</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="CanAddProducts" class="form-check-input" placeholder="@Model.CanAddProducts" />
+                    <label asp-for="CanAddProducts" class="form-check-label">Может добавлять товары и категории</label>
+                </div>
+                <h6>Статистика</h6>
+                <div class="form-check">
+                    <input asp-for="CanViewStatistics" class="form-check-input" placeholder="@Model.CanViewStatistics" />
+                    <label asp-for="CanViewStatistics" class="form-check-label">Может просматривать статистику</label>
+                </div>
+                <h6>Пользователи</h6>
+                <div class="form-check">
+                    <input asp-for="CanViewUsersList" class="form-check-input" placeholder="@Model.CanViewUsersList" />
+                    <label asp-for="CanViewUsersList" class="form-check-label">Может просматривать список пользователей</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="CanSetRoles" class="form-check-input" placeholder="@Model.CanSetRoles" />
+                    <label asp-for="CanSetRoles" class="form-check-label">Может управлять правами доступа пользователей</label>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <button class="btn btn-success btn-transparent rounded-pill" type="submit">Сохранить</button>
+        </div>
+        <br />
+    </form>
+
+</div>

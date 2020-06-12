@@ -29,9 +29,9 @@ namespace _3Lab.Controllers
         }
 
         [HttpPost("GetModel")]
-        public async Task<ActionResult> GetModel(int userToEdit)
+        public async Task<ActionResult> GetModel([FromForm] int userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userToEdit);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
 
             if (user == null)
             {
@@ -51,7 +51,8 @@ namespace _3Lab.Controllers
                 CanAddProducts = role.CanAddProducts,
                 CanEditProducts = role.CanEditProducts,
                 CanModerateComments = role.CanModerateComments,
-                CanViewUsersList = role.CanViewUsersList
+                CanViewUsersList = role.CanViewUsersList,
+                CanManageOrders = role.CanManageOrders
             };
 
             return Ok(changeUserPermissionViewModel);
@@ -79,14 +80,14 @@ namespace _3Lab.Controllers
             return Forbid();
         }
 
-        [HttpGet("GetAll")]
+        [HttpPost("GetAll")]
         public async Task<ActionResult> GetAll([FromForm] int productPage = 1)
         {
             var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
 
             if (role.CanViewUsersList == false)
             {
-                //return Forbid();
+                return Forbid();
             }
 
             var users = _context.Users;
@@ -106,10 +107,11 @@ namespace _3Lab.Controllers
 
             return Ok(new 
             { 
-                applicationUsers = users
+                ApplicationUsers = users
                         .Skip((productPage - 1) * PageSize)
-                        .Take(PageSize),
-                pagingInfo = paging
+                        .Take(PageSize)
+                        .ToList(),
+                PagingInfo = paging
             }
             );
         }
