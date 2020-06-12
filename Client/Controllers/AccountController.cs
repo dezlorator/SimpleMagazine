@@ -106,6 +106,7 @@ namespace PetStore.Controllers
                             var obj = JsonConvert.DeserializeObject<LoginResponse>(json);
                             TokenKeeper.Token = obj.access_token;
                             TokenKeeper.UserName = obj.username;
+                            TokenKeeper.Permissions = obj.Role;
 
                             return RedirectToAction("List", "Product");
                         }

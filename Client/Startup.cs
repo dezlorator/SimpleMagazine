@@ -28,14 +28,6 @@ namespace PetStore
                 options.UseSqlServer(
                     Configuration["Data:PetStoreProducts:ConnectionString"]));
 
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration["Data:PetStoreIdentity:ConnectionString"]));
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AppIdentityDbContext>()
-                .AddDefaultTokenProviders();
-
             services.AddTransient<IProductExtendedRepository, EFProductExtendedRepository>();
             services.AddTransient<ICommentRepository, EFCommentRepository>();
             services.AddTransient<IProductRepository, EFProductRepository>();

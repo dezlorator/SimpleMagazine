@@ -26,7 +26,7 @@ namespace _3Lab.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpPut("GetModel")]
+        [HttpPost("GetModel")]
         public async Task<ActionResult> GetModel(int userToEdit)
         {
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userToEdit);
@@ -89,7 +89,7 @@ namespace _3Lab.Controllers
 
             var users = _context.Users;
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 user.Role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == user.RoleId);
             }
@@ -97,19 +97,19 @@ namespace _3Lab.Controllers
             return Ok(users);
         }
 
-        [HttpDelete("{userId}")]
-        public async Task<ActionResult> ChangePermission([FromQuery] int userId)
+        [HttpPost("Delete")]
+        public async Task<ActionResult> Delete([FromForm] int userId)
         {
             var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
 
-            if(role.CanDeleteUsers == false)
+            if (role.CanDeleteUsers == false)
             {
                 return Forbid();
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
 
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }

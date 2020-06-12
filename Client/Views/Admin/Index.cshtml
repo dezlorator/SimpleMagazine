@@ -54,26 +54,35 @@
                             <td class="text-right">@item.Quantity</td>
                             <td style="width:15%" class="text-center">
                                 <form asp-action="Delete" method="post">
-                                    <a asp-action="Edit" class="btn btn-sm btn-warning rounded-pill"
-                                       asp-route-productId="@item.Product.ID">
-                                        Редактировать
-                                    </a>
+                                    @if (Client.Models.TokenKeeper.Permissions.CanEditProducts)
+                                    {
+                                        <a asp-action="Edit" class="btn btn-sm btn-warning rounded-pill"
+                                           asp-route-productId="@item.Product.ID">
+                                            Редактировать
+                                        </a>
+                                    }
                                     <input type="hidden" name="ProductID" value="@item.Product.ID" />
-                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill">
-                                        Удалить
-                                    </button>
+                                    @if (Client.Models.TokenKeeper.Permissions.CanDeleteProducts)
+                                    {
+                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill">
+                                            Удалить
+                                        </button>
+                                    }
                                 </form>
-                                <form class="form-inline mt-2" asp-action="AddToStock" method="post">
-                                    <input type="hidden" name="productId" value="@item.Product.ID" />
-                                    <div class="input-group">
-                                        <input type="number" name="Quantity" value="0" min="0" class="form-control form-control-sm rounded-pill" />
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary btn-sm rounded-pill ml-1">
-                                                Заказать
-                                            </button>
+                                @if (Client.Models.TokenKeeper.Permissions.CanPurchaseToStock)
+                                {
+                                    <form class="form-inline mt-2" asp-action="AddToStock" method="post">
+                                        <input type="hidden" name="productId" value="@item.Product.ID" />
+                                        <div class="input-group">
+                                            <input type="number" name="Quantity" value="0" min="0" class="form-control form-control-sm rounded-pill" />
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-primary btn-sm rounded-pill ml-1">
+                                                    Заказать
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }
@@ -88,7 +97,10 @@
      class="btn-group mt-2">
 </div>
 <br />
-<div class="text-center">
-    <a asp-action="Create" class="btn btn-primary btn-transparent rounded-pill">Добавить продукт</a>
-</div>
+@if (Client.Models.TokenKeeper.Permissions.CanAddProducts)
+{
+    <div class="text-center">
+        <a asp-action="Create" class="btn btn-primary btn-transparent rounded-pill">Добавить продукт</a>
+    </div>
+}
 <br />

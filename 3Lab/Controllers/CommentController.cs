@@ -72,11 +72,6 @@ namespace PetStore.Controllers
         {
             var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
 
-            if (role.CanModerateComments == false)
-            {
-                return Forbid();
-            }
-
             var comment = _commentRepository.Сomment.FirstOrDefault(p => p.ID == commentId);
             var productId = _productExtendedRepository.ProductsExtended.FirstOrDefault(p => p.Comments.Any(c => c.ID == commentId)).Product.ID;
 
@@ -95,9 +90,11 @@ namespace PetStore.Controllers
         }
 
         [HttpPut]
-        public IActionResult Edit([FromForm]CommentViewModel commentModel, [FromForm]int id)
+        public async Task<IActionResult> Edit([FromForm]CommentViewModel commentModel, [FromForm]int id)
         {
-            if (this.GetUserName() != commentModel.UserName)
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
+
+            if (this.GetUserName() != commentModel.UserName && !role.CanModerateComments)
             {
                 return BadRequest(commentModel.ReturnUrl);
             }
