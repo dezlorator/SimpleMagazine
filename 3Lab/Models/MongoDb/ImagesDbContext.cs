@@ -20,11 +20,11 @@ namespace PetStore.Models.MongoDb
             string connectionString = "mongodb+srv://admin:123@cluster0-yxi0t.azure.mongodb.net/test?retryWrites=true&w=majority";
             var connection = new MongoUrlBuilder(connectionString);
             // получаем клиента для взаимодействия с базой данных
-            //MongoClient client = new MongoClient(connectionString);
-            //// получаем доступ к самой базе данных
-            //_database = client.GetDatabase("Images");
-            //// получаем доступ к файловому хранилищу
-            //_gridFS = new GridFSBucket(_database);
+            MongoClient client = new MongoClient(connectionString);
+            // получаем доступ к самой базе данных
+            _database = client.GetDatabase("Images");
+            // получаем доступ к файловому хранилищу
+            _gridFS = new GridFSBucket(_database);
         }
 
         public async Task<byte[]> GetImage(string id)
