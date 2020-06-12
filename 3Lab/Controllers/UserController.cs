@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PetStore.Models;
+using PetStore.Models.ViewModels;
 
 namespace _3Lab.Controllers
 {
@@ -18,6 +19,7 @@ namespace _3Lab.Controllers
     {
         private readonly ApplicationDbContext _context;
         private IEFUserRepository _userRepository;
+        private const int PageSize = 2; 
 
         public UserController(ApplicationDbContext cotenxt,
                               IEFUserRepository userRepository)
@@ -78,13 +80,13 @@ namespace _3Lab.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult> GetAll()
+        public async Task<ActionResult> GetAll([FromForm] int productPage = 1)
         {
             var role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == this.GetUserRole());
 
             if (role.CanViewUsersList == false)
             {
-                return Forbid();
+                //return Forbid();
             }
 
             var users = _context.Users;
@@ -92,9 +94,24 @@ namespace _3Lab.Controllers
             foreach (var user in users)
             {
                 user.Role = await _context.UserRole.FirstOrDefaultAsync(role => role.Id == user.RoleId);
+                user.Role.User = null;
             }
 
-            return Ok(users);
+            var paging = new PagingInfo
+            {
+                CurrentPage = productPage,
+                ItemsPerPage = PageSize,
+                TotalItems = users.Count()
+            };
+
+            return Ok(new 
+            { 
+                applicationUsers = users
+                        .Skip((productPage - 1) * PageSize)
+                        .Take(PageSize),
+                pagingInfo = paging
+            }
+            );
         }
 
         [HttpPost("Delete")]
