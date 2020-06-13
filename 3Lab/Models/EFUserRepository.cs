@@ -64,16 +64,17 @@ namespace _3Lab.Models
         public async Task UpdateUserRole(ChangeUserPermissionViewModel userRole)
         {
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userRole.UserId);
-            user.Role.CanAddComments = userRole.CanAddComments;
-            user.Role.CanAddProducts = userRole.CanAddProducts;
-            user.Role.CanDeleteProducts = userRole.CanDeleteProducts;
-            user.Role.CanEditProducts = userRole.CanEditProducts;
-            user.Role.CanModerateComments = userRole.CanModerateComments;
-            user.Role.CanPurchaseToStock = userRole.CanPurchaseToStock;
-            user.Role.CanSetRoles = userRole.CanSetRoles;
-            user.Role.CanViewStatistics = userRole.CanViewStatistics;
-            user.Role.CanViewUsersList = userRole.CanViewUsersList;
-            user.Role.CanManageOrders = userRole.CanManageOrders;
+            var role = await _context.UserRole.FirstOrDefaultAsync(role => role.User.Id == user.Id);
+            role.CanAddComments = userRole.CanAddComments;
+            role.CanAddProducts = userRole.CanAddProducts;
+            role.CanDeleteProducts = userRole.CanDeleteProducts;
+            role.CanEditProducts = userRole.CanEditProducts;
+            role.CanModerateComments = userRole.CanModerateComments;
+            role.CanPurchaseToStock = userRole.CanPurchaseToStock;
+            role.CanSetRoles = userRole.CanSetRoles;
+            role.CanViewStatistics = userRole.CanViewStatistics;
+            role.CanViewUsersList = userRole.CanViewUsersList;
+            role.CanManageOrders = userRole.CanManageOrders;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
